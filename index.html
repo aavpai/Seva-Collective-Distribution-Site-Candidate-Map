@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Seva Second Distribution Site Analysis</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--ink:#172033;--muted:#64748b;--panel:#fff;--line:#dbe3ec;--blue:#2563eb;--orange:#f59e0b;--red:#dc2626;--green:#16a34a;--purple:#a855f7;--teal:#0f766e;--bg:#f6f8fb}
+*{box-sizing:border-box} html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+.page{height:100%;display:grid;grid-template-rows:auto 1fr} header{background:#fff;border-bottom:1px solid var(--line);padding:12px 16px;display:flex;gap:16px;align-items:center;justify-content:space-between;z-index:1001}
+header h1{font-size:18px;margin:0} header p{font-size:12px;margin:3px 0 0;color:var(--muted)} .badge{font-size:11px;font-weight:700;padding:5px 8px;border:1px solid #bbf7d0;background:#f0fdf4;border-radius:999px;color:#166534;white-space:nowrap}
+.layout{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 340px} #map{height:100%;min-height:520px;background:#eef2f7} aside{overflow:auto;background:#fff;border-left:1px solid var(--line);padding:14px}
+.card{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.03)} .card h2{font-size:14px;margin:0 0 8px} .card p{font-size:12px;line-height:1.45;color:#475569;margin:6px 0}
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px} .metric{background:#f8fafc;border:1px solid #edf2f7;border-radius:9px;padding:8px} .metric b{display:block;font-size:16px} .metric span{font-size:10px;color:var(--muted)}
+.candidate{border-left:4px solid var(--blue)} .candidate[data-zip="92703"]{border-left-color:var(--teal)} .candidate[data-zip="92707"]{border-left-color:var(--purple)} .candidate[data-zip="92780"]{border-left-color:var(--green)}
+.candidate h3{font-size:13px;margin:0 0 5px} .candidate .mini{font-size:11px;color:#475569;line-height:1.45} .reco{border:1px solid #bfdbfe;background:#eff6ff} .reco strong{color:#1d4ed8}
+.controls{position:absolute;top:12px;left:12px;z-index:800;display:flex;gap:6px;flex-wrap:wrap;max-width:75%} .controls button{border:1px solid #cbd5e1;background:#fff;border-radius:7px;padding:7px 10px;font-weight:700;font-size:11px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.12)} .controls button:hover{background:#f8fafc}
+.layerbox{position:absolute;bottom:22px;left:12px;z-index:800;background:rgba(255,255,255,.96);border:1px solid #cbd5e1;border-radius:10px;padding:9px 10px;box-shadow:0 1px 5px rgba(0,0,0,.12);font-size:11px} .layerbox label{display:block;margin:4px 0}
+.legend-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px} .site-icon{width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.28)} .site-icon>span{display:flex;align-items:center;justify-content:center;width:100%;height:100%;transform:rotate(45deg);color:#fff;font-size:10px;font-weight:800}
+.current{background:var(--red)} .c92704{background:var(--blue)} .c92703{background:var(--teal)} .c92707{background:var(--purple)} .c92780{background:var(--green)} .leaflet-popup-content{font-size:12px;line-height:1.45} .leaflet-popup-content b{font-size:13px}
+.tile-warning{display:none;position:absolute;top:56px;left:12px;z-index:900;background:#fff7ed;border:1px solid #fdba74;border-radius:8px;padding:8px 10px;font-size:11px;max-width:310px}
+@media(max-width:900px){.layout{grid-template-columns:1fr;grid-template-rows:62vh auto} aside{border-left:0;border-top:1px solid var(--line)} header{align-items:flex-start} header h1{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="page">
+<header><div><h1>Seva Second Distribution Site Analysis</h1><p>Recipient geography, repeat demand, family composition, and candidate-site comparison</p></div><div class="badge">Clean build · OpenStreetMap · no API key</div></header>
+<div class="layout">
+<div style="position:relative;min-height:0">
+<div id="map"></div>
+<div id="tileWarning" class="tile-warning">The road basemap could not load. The Seva data layers and California boundary are still available.</div>
+<div class="controls"><button id="ocBtn">Orange County</button><button id="caBtn">California</button><button id="fitBtn">Fit recipients</button></div>
+<div class="layerbox"><b>Layers</b><label><input id="zipToggle" type="checkbox" checked> Recipient ZIP bubbles</label><label><input id="densityToggle" type="checkbox"> Density overlay</label><label><input id="siteToggle" type="checkbox" checked> Current + candidate sites</label><label><input id="travelToggle" type="checkbox"> Current travel lines</label><div style="margin-top:6px;color:#64748b"><span class="legend-dot" style="background:#2563eb"></span>Bubble size = households<br><span class="legend-dot" style="background:#f59e0b"></span>Density = recipient concentration</div></div>
+</div>
+<aside>
+<div class="card reco"><h2>Overall finding</h2><p><strong>92704 is the strongest overall candidate</strong> among the four areas evaluated because it combines the largest potential reach, the greatest historical demand, substantial family need, and a previously used Seva site that may be available again.</p></div>
+<div class="card"><h2>92704 at a glance</h2><div class="metric-grid"><div class="metric"><b>2,939</b><span>households potentially closer</span></div><div class="metric"><b>12,577</b><span>historical visits in catchment</span></div><div class="metric"><b>534</b><span>6+ visit households</span></div><div class="metric"><b>2.24 mi</b><span>estimated avg. distance reduction</span></div></div></div>
+<div class="card candidate" data-zip="92704"><h3>92704 · Southwest Santa Ana</h3><div class="mini"><b>2,939</b> potentially closer · <b>12,577</b> historical visits · <b>2.24 mi</b> avg. reduction<br>1,028 Seva households live directly in the ZIP; avg. household 4.6; 73.5% include children; 20.1% include a senior.<br><b>Practical advantage:</b> Seva distributed in this area previously and a site may be accessible again.</div></div>
+<div class="card candidate" data-zip="92703"><h3>92703 · West Santa Ana</h3><div class="mini"><b>2,660</b> potentially closer · <b>11,156</b> historical visits · <b>2.31 mi</b> avg. reduction<br>Largest average household size (4.9); 81.1% of complete-age households include children.</div></div>
+<div class="card candidate" data-zip="92707"><h3>92707 · South Santa Ana</h3><div class="mini"><b>1,973</b> potentially closer · <b>8,425</b> historical visits · <b>2.00 mi</b> avg. reduction<br>Highest measured multigenerational share (13.6%) and 20.2% include a senior.</div></div>
+<div class="card candidate" data-zip="92780"><h3>92780 · Tustin / East</h3><div class="mini"><b>1,352</b> potentially closer · <b>7,559</b> historical visits · <b>1.32 mi</b> avg. reduction<br>Smaller reach but unusually persistent demand: 6.1 average lifetime visits and 29.9% with 6+ visits.</div></div>
+<div class="card"><h2>Interpretation</h2><p>ZIP bubbles use aggregated Seva recipient information, not street addresses. Candidate points are geographic scenarios, not exact proposed facilities. Travel burden uses straight-line ZIP-centroid distance and is preliminary.</p></div>
+</aside>
+</div></div>
+
+<script>
+const ZIP_DATA=[{"zip": "92701", "lat": 33.7468, "lon": -117.8554, "households": 1504, "visits": 7609, "avg_visits": 5.06, "six_plus": 380, "six_plus_pct": 25.3, "current_dist": 0.45}, {"zip": "92704", "lat": 33.7198, "lon": -117.9141, "households": 1028, "visits": 4172, "avg_visits": 4.06, "six_plus": 176, "six_plus_pct": 17.1, "current_dist": 4.04}, {"zip": "92705", "lat": 33.7635, "lon": -117.7966, "households": 777, "visits": 4063, "avg_visits": 5.23, "six_plus": 183, "six_plus_pct": 23.6, "current_dist": 3.36}, {"zip": "92707", "lat": 33.6966, "lon": -117.871, "households": 735, "visits": 3215, "avg_visits": 4.37, "six_plus": 142, "six_plus_pct": 19.3, "current_dist": 3.42}, {"zip": "92703", "lat": 33.7488, "lon": -117.9094, "households": 658, "visits": 2633, "avg_visits": 4.0, "six_plus": 108, "six_plus_pct": 16.4, "current_dist": 3.47}, {"zip": "92780", "lat": 33.7376, "lon": -117.8212, "households": 575, "visits": 3496, "avg_visits": 6.08, "six_plus": 172, "six_plus_pct": 29.9, "current_dist": 1.66}, {"zip": "92706", "lat": 33.7676, "lon": -117.8817, "households": 293, "visits": 1041, "avg_visits": 3.55, "six_plus": 42, "six_plus_pct": 14.3, "current_dist": 2.53}, {"zip": "92683", "lat": 33.7491, "lon": -117.9937, "households": 93, "visits": 503, "avg_visits": 5.41, "six_plus": 20, "six_plus_pct": 21.5, "current_dist": 8.3}, {"zip": "92843", "lat": 33.7643, "lon": -117.9318, "households": 89, "visits": 383, "avg_visits": 4.3, "six_plus": 15, "six_plus_pct": 16.9, "current_dist": 4.97}, {"zip": "92708", "lat": 33.7101, "lon": -117.9477, "households": 69, "visits": 300, "avg_visits": 4.35, "six_plus": 13, "six_plus_pct": 18.8, "current_dist": 6.08}, {"zip": "92804", "lat": 33.8104, "lon": -117.9794, "households": 68, "visits": 295, "avg_visits": 4.34, "six_plus": 12, "six_plus_pct": 17.6, "current_dist": 8.81}, {"zip": "92840", "lat": 33.7886, "lon": -117.9277, "households": 65, "visits": 381, "avg_visits": 5.86, "six_plus": 15, "six_plus_pct": 23.1, "current_dist": 5.5}, {"zip": "92702", "lat": 33.7457, "lon": -117.8669, "households": 60, "visits": 322, "avg_visits": 5.37, "six_plus": 11, "six_plus_pct": 18.3, "current_dist": 1.03}, {"zip": "92805", "lat": 33.8263, "lon": -117.9105, "households": 59, "visits": 315, "avg_visits": 5.34, "six_plus": 15, "six_plus_pct": 25.4, "current_dist": 6.76}, {"zip": "92802", "lat": 33.8107, "lon": -117.9168, "households": 56, "visits": 243, "avg_visits": 4.34, "six_plus": 12, "six_plus_pct": 21.4, "current_dist": 6.09}, {"zip": "92868", "lat": 33.7882, "lon": -117.8817, "households": 48, "visits": 195, "avg_visits": 4.06, "six_plus": 8, "six_plus_pct": 16.7, "current_dist": 3.65}, {"zip": "92627", "lat": 33.649, "lon": -117.9178, "households": 48, "visits": 235, "avg_visits": 4.9, "six_plus": 11, "six_plus_pct": 22.9, "current_dist": 7.57}, {"zip": "92806", "lat": 33.831, "lon": -117.8668, "households": 48, "visits": 110, "avg_visits": 2.29, "six_plus": 6, "six_plus_pct": 12.5, "current_dist": 6.18}, {"zip": "92801", "lat": 33.84441, "lon": -117.95175, "households": 46, "visits": 213, "avg_visits": 4.63, "six_plus": 10, "six_plus_pct": 21.7, "current_dist": 9.16}, {"zip": "92841", "lat": 33.7866, "lon": -117.9828, "households": 40, "visits": 247, "avg_visits": 6.18, "six_plus": 12, "six_plus_pct": 30.0, "current_dist": 8.24}];
+const CANDIDATES=[{"zip": "92704", "name": "Southwest Santa Ana", "lat": 33.7198, "lon": -117.9141, "closer_households": 2939, "historical_visits": 12577, "six_plus": 534, "avg_reduction": 2.24, "seva_households": 1028, "avg_household": 4.6, "median_household": 4, "five_plus_pct": 49.9, "children_pct": 73.5, "avg_children": 1.8, "senior_pct": 20.1, "multi_pct": 10.1, "avg_lifetime_visits": 4.1, "direct_six_plus_pct": 17.1, "note": "Largest geographic reach; Seva previously distributed in this area and a site may be available again."}, {"zip": "92703", "name": "West Santa Ana", "lat": 33.7488, "lon": -117.9094, "closer_households": 2660, "historical_visits": 11156, "six_plus": 469, "avg_reduction": 2.31, "seva_households": 658, "avg_household": 4.9, "median_household": 5, "five_plus_pct": 56.4, "children_pct": 81.1, "avg_children": 2.0, "senior_pct": 17.3, "multi_pct": 11.8, "avg_lifetime_visits": 4.0, "direct_six_plus_pct": 16.4, "note": "Slightly greater estimated distance reduction and the largest average households."}, {"zip": "92707", "name": "South Santa Ana", "lat": 33.6966, "lon": -117.871, "closer_households": 1973, "historical_visits": 8425, "six_plus": 362, "avg_reduction": 2.0, "seva_households": 735, "avg_household": 4.8, "median_household": 5, "five_plus_pct": 54.1, "children_pct": 80.5, "avg_children": 1.9, "senior_pct": 20.2, "multi_pct": 13.6, "avg_lifetime_visits": 4.4, "direct_six_plus_pct": 19.3, "note": "Meaningful southern access; highest measured share of multigenerational households."}, {"zip": "92780", "name": "Tustin / Eastern Area", "lat": 33.7376, "lon": -117.8212, "closer_households": 1352, "historical_visits": 7559, "six_plus": 355, "avg_reduction": 1.32, "seva_households": 575, "avg_household": 4.7, "median_household": 5, "five_plus_pct": 51.5, "children_pct": 78.1, "avg_children": 1.8, "senior_pct": 18.2, "multi_pct": 12.5, "avg_lifetime_visits": 6.1, "direct_six_plus_pct": 29.9, "note": "Smaller reach, but strongest repeat-use behavior and highly persistent Seva users."}];
+const CURRENT_SITE={"name": "Current Seva Distribution Site", "detail": "Villa Fundamental Intermediate School", "lat": 33.74269, "lon": -117.84937};
+const CA_OUTLINE=[[42.0, -124.4], [41.0, -124.2], [40.0, -124.0], [39.0, -123.8], [38.0, -123.0], [37.3, -122.5], [36.5, -121.9], [35.6, -121.2], [34.9, -120.6], [34.4, -120.0], [34.0, -118.5], [33.7, -118.2], [32.75, -117.25], [32.53, -117.12], [32.7, -114.72], [34.9, -114.63], [35.0, -114.63], [36.0, -114.7], [37.0, -117.0], [38.0, -119.0], [39.0, -120.0], [40.0, -120.0], [41.0, -120.0], [42.0, -120.0], [42.0, -124.4]];
+
+if(typeof L==="undefined"){
+ document.getElementById("map").innerHTML='<div style="padding:30px;font:14px system-ui">Map library could not load. Please refresh with internet access.</div>';
+} else {
+ const map=L.map("map",{zoomControl:true,preferCanvas:true}).setView([33.742,-117.885],10);
+ const osm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"&copy; OpenStreetMap contributors"});
+ let tileErrors=0; osm.on("tileerror",()=>{tileErrors++;if(tileErrors>4)document.getElementById("tileWarning").style.display="block";}); osm.addTo(map);
+ L.polygon(CA_OUTLINE,{color:"#475569",weight:2,fill:false,opacity:.65,interactive:false}).addTo(map);
+
+ const zipLayer=L.layerGroup().addTo(map), densityLayer=L.layerGroup(), siteLayer=L.layerGroup().addTo(map), travelLayer=L.layerGroup();
+ const maxHH=Math.max(...ZIP_DATA.map(d=>d.households));
+ ZIP_DATA.forEach(d=>{
+  const r=5+21*Math.sqrt(d.households/maxHH);
+  L.circleMarker([d.lat,d.lon],{radius:r,color:"#275d83",weight:2,fillColor:"#7fa6c9",fillOpacity:.68})
+   .bindPopup(`<b>ZIP ${d.zip}</b><br>${d.households.toLocaleString()} Seva households<br>${d.visits.toLocaleString()} historical visits<br>${d.avg_visits.toFixed(2)} avg. visits / household<br>${d.six_plus} households with 6+ visits (${d.six_plus_pct}%)<br>Approx. ${d.current_dist.toFixed(2)} mi from current site`).addTo(zipLayer);
+  L.circleMarker([d.lat,d.lon],{radius:r*2.15,stroke:false,fillColor:"#f59e0b",fillOpacity:.05+.23*(d.households/maxHH),interactive:false}).addTo(densityLayer);
+  L.polyline([[d.lat,d.lon],[CURRENT_SITE.lat,CURRENT_SITE.lon]],{color:"#64748b",weight:1+Math.min(2.5,d.current_dist/4),opacity:.20+Math.min(.45,d.current_dist/15),dashArray:"4 6",interactive:false}).addTo(travelLayer);
+ });
+
+ function siteIcon(css,label){return L.divIcon({className:"",html:`<div class="site-icon ${css}"><span>${label}</span></div>`,iconSize:[34,34],iconAnchor:[17,30],popupAnchor:[0,-30]})}
+ L.marker([CURRENT_SITE.lat,CURRENT_SITE.lon],{icon:siteIcon("current","NOW")}).bindPopup(`<b>${CURRENT_SITE.name}</b><br>${CURRENT_SITE.detail}`).addTo(siteLayer);
+ const cssByZip={"92704":"c92704","92703":"c92703","92707":"c92707","92780":"c92780"};
+ CANDIDATES.forEach(c=>{
+  L.marker([c.lat,c.lon],{icon:siteIcon(cssByZip[c.zip],c.zip.slice(-2))})
+   .bindPopup(`<b>${c.zip} · ${c.name}</b><br><b>${c.closer_households.toLocaleString()}</b> households potentially closer<br>${c.historical_visits.toLocaleString()} historical visits in catchment<br>${c.six_plus} 6+ visit households in catchment<br>${c.avg_reduction.toFixed(2)} mi estimated avg. distance reduction<hr style="border:0;border-top:1px solid #ddd">Direct ZIP composition:<br>${c.seva_households.toLocaleString()} Seva households · avg. size ${c.avg_household}<br>${c.children_pct}% with children · ${c.senior_pct}% with a senior<br>${c.multi_pct}% multigenerational · ${c.avg_lifetime_visits} avg. lifetime visits<br><br><i>${c.note}</i>`).addTo(siteLayer);
+ });
+ const cities=[["Santa Ana",33.7455,-117.8677],["Tustin",33.7459,-117.8262],["Irvine",33.6846,-117.8265],["Anaheim",33.8366,-117.9143],["Garden Grove",33.7743,-117.9379],["Costa Mesa",33.6411,-117.9187],["Westminster",33.7513,-117.9939]];
+ cities.forEach(([name,lat,lon])=>L.marker([lat,lon],{interactive:false,icon:L.divIcon({className:"",html:`<div style="font:700 11px system-ui;color:#475569;text-shadow:0 1px 0 white,1px 0 0 white,-1px 0 0 white">${name}</div>`,iconSize:[90,16],iconAnchor:[45,8]})}).addTo(map));
+ document.getElementById("ocBtn").onclick=()=>map.setView([33.742,-117.885],10);
+ document.getElementById("caBtn").onclick=()=>map.setView([37.25,-119.50],5);
+ document.getElementById("fitBtn").onclick=()=>map.fitBounds(L.latLngBounds(ZIP_DATA.map(d=>[d.lat,d.lon])).pad(.12));
+ function toggle(id,layer){document.getElementById(id).addEventListener("change",e=>e.target.checked?layer.addTo(map):map.removeLayer(layer));}
+ toggle("zipToggle",zipLayer);toggle("densityToggle",densityLayer);toggle("siteToggle",siteLayer);toggle("travelToggle",travelLayer);
+}
+</script>
+</body></html>

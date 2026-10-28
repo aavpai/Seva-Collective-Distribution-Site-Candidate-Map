@@ -1,0 +1,5 @@
+zip,name,lat,lon,closer_households,historical_visits,six_plus,avg_reduction,seva_households,avg_household,median_household,five_plus_pct,children_pct,avg_children,senior_pct,multi_pct,avg_lifetime_visits,direct_six_plus_pct,note
+92704,Southwest Santa Ana,33.7198,-117.9141,2939,12577,534,2.24,1028,4.6,4,49.9,73.5,1.8,20.1,10.1,4.1,17.1,Largest geographic reach; Seva previously distributed in this area and a site may be available again.
+92703,West Santa Ana,33.7488,-117.9094,2660,11156,469,2.31,658,4.9,5,56.4,81.1,2.0,17.3,11.8,4.0,16.4,Slightly greater estimated distance reduction and the largest average households.
+92707,South Santa Ana,33.6966,-117.871,1973,8425,362,2.0,735,4.8,5,54.1,80.5,1.9,20.2,13.6,4.4,19.3,Meaningful southern access; highest measured share of multigenerational households.
+92780,Tustin / Eastern Area,33.7376,-117.8212,1352,7559,355,1.32,575,4.7,5,51.5,78.1,1.8,18.2,12.5,6.1,29.9,"Smaller reach, but strongest repeat-use behavior and highly persistent Seva users."
