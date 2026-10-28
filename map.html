@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_a87b2cfb8dfffa245a38002ae3de889a {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; background:#dbeaf2; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/python-visualization/folium@main/folium/templates/leaflet_heat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+</head>
+<body>
+    
+    
+<div style="
+ position: fixed; bottom: 18px; left: 18px; z-index: 9999;
+ background: rgba(255,255,255,0.94); border: 1px solid #999;
+ border-radius: 8px; padding: 10px 12px; width: 310px;
+ font: 12px/1.35 Arial, sans-serif; color:#222;">
+ <b>Seva second-site exploration</b><br>
+ Top 20 ZIPs shown: <b>6,359</b> households,
+ representing <b>87.2%</b> of the 7,291
+ attendees with a valid ZIP.<br><br>
+ <b>Privacy:</b> aggregated ZIP-level data only; no household addresses are mapped.<br>
+ <b>Travel burden:</b> straight-line distance from ZIP centroid, not driving time.<br><b>Map background:</b> OpenStreetMap road/city basemap (no API key required), with an embedded California outline as a fallback.<br>
+ <b>Candidates:</b> exploratory ZIP-centroid scenarios, not recommended facilities.
+</div>
+    
+<div style="
+ position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+ z-index: 9999; background: rgba(255,255,255,0.95);
+ padding: 9px 16px; border-radius: 8px; border: 1px solid #aaa;
+ font: 600 16px Arial, sans-serif;">
+ Seva recipient geography & second-site exploration
+</div>
+    
+            <div class="folium-map" id="map_a87b2cfb8dfffa245a38002ae3de889a" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_a87b2cfb8dfffa245a38002ae3de889a = L.map(
+                "map_a87b2cfb8dfffa245a38002ae3de889a",
+                {
+                    center: [33.744, -117.884],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 11,
+  "zoomControl": true,
+  "preferCanvas": true,
+}
+
+                }
+            );
+            L.control.scale().addTo(map_a87b2cfb8dfffa245a38002ae3de889a);
+
+            // OpenStreetMap Standard basemap — no API key required.
+            // This provides roads, cities, boundaries, and recognizable California geography.
+            var osm_basemap = L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap contributors'
+                }
+            ).addTo(map_a87b2cfb8dfffa245a38002ae3de889a);
+
+            // Self-contained California vector background: no tile service and no API key.
+            var californiaOutline = [[42.006186, -123.233256], [42.011663, -122.378853], [41.995232, -121.037003], [41.995232, -120.001861], [40.264519, -119.996384], [38.999346, -120.001861], [38.101128, -118.71478], [37.21934, -117.498899], [36.501861, -116.540435], [35.970598, -115.85034], [35.00118, -114.634459], [34.87521, -114.634459], [34.710902, -114.470151], [34.448009, -114.333228], [34.305608, -114.136058], [34.174162, -114.256551], [34.108438, -114.415382], [33.933176, -114.535874], [33.697668, -114.497536], [33.54979, -114.524921], [33.40739, -114.727567], [33.034958, -114.661844], [33.029481, -114.524921], [32.843265, -114.470151], [32.755634, -114.524921], [32.717295, -114.72209], [32.624187, -116.04751], [32.536556, -117.126467], [32.668003, -117.24696], [32.876127, -117.252437], [33.122589, -117.329114], [33.297851, -117.471515], [33.538836, -117.7837], [33.763391, -118.183517], [33.703145, -118.260194], [33.741483, -118.413548], [33.840068, -118.391641], [34.042715, -118.566903], [33.998899, -118.802411], [34.146777, -119.218659], [34.26727, -119.278905], [34.415147, -119.558229], [34.40967, -119.875891], [34.475393, -120.138784], [34.448009, -120.472878], [34.579455, -120.64814], [34.858779, -120.609801], [34.902595, -120.670048], [35.099764, -120.631709], [35.247642, -120.894602], [35.450289, -120.905556], [35.461243, -121.004141], [35.636505, -121.168449], [35.674843, -121.283465], [35.784382, -121.332757], [36.195153, -121.716143], [36.315645, -121.896882], [36.638785, -121.935221], [36.6114, -121.858544], [36.803093, -121.787344], [36.978355, -121.929744], [36.956447, -122.105006], [37.115279, -122.335038], [37.241248, -122.417192], [37.361741, -122.400761], [37.520572, -122.515777], [37.783465, -122.515777], [37.783465, -122.329561], [38.15042, -122.406238], [38.112082, -122.488392], [37.931343, -122.504823], [37.893004, -122.701993], [38.029928, -122.937501], [38.265436, -122.97584], [38.451652, -123.129194], [38.566668, -123.331841], [38.698114, -123.44138], [38.95553, -123.737134], [39.032208, -123.687842], [39.366301, -123.824765], [39.552517, -123.764519], [39.831841, -123.85215], [40.105688, -124.109566], [40.259042, -124.361506], [40.439781, -124.410798], [40.877937, -124.158859], [41.025814, -124.109566], [41.14083, -124.158859], [41.442061, -124.065751], [41.715908, -124.147905], [41.781632, -124.257444], [42.000709, -124.213628], [42.006186, -123.233256]];
+            var californiaLayer = L.polygon(californiaOutline, {
+                color: '#6b7280', weight: 2.2, fillColor: '#f3efe4', fillOpacity: 0.04, interactive: false
+            }).addTo(map_a87b2cfb8dfffa245a38002ae3de889a);
+            californiaLayer.bringToBack();
+
+            // Geographic reference labels (point labels only; no external basemap).
+            var referenceLabels = [
+              [38.5816,-121.4944,'Sacramento'],[37.7749,-122.4194,'San Francisco'],
+              [34.0522,-118.2437,'Los Angeles'],[33.7455,-117.8677,'Santa Ana'],
+              [33.8366,-117.9143,'Anaheim'],[33.6846,-117.8265,'Irvine'],
+              [33.7458,-117.8262,'Tustin'],[33.6411,-117.9187,'Costa Mesa'],
+              [32.7157,-117.1611,'San Diego']
+            ];
+            referenceLabels.forEach(function(d) {
+                L.marker([d[0],d[1]], {
+                    interactive:false,
+                    icon:L.divIcon({className:'', html:'<div style="font:600 11px Arial;color:#4b5563;text-shadow:0 1px 2px white;white-space:nowrap">'+d[2]+'</div>', iconSize:[90,16], iconAnchor:[45,8]})
+                }).addTo(map_a87b2cfb8dfffa245a38002ae3de889a);
+            });
+
+            // Title for statewide view.
+            L.marker([36.65,-119.55], {interactive:false, icon:L.divIcon({className:'', html:'<div style="font:700 22px Arial;color:#7c7465;letter-spacing:3px;opacity:.5">CALIFORNIA</div>', iconSize:[170,28], iconAnchor:[85,14]})}).addTo(map_a87b2cfb8dfffa245a38002ae3de889a);
+
+L.control.fullscreen(
+                {
+  "position": "topleft",
+  "title": "Fullscreen",
+  "titleCancel": "Exit fullscreen",
+  "forceSeparateButton": false,
+}
+            ).addTo(map_a87b2cfb8dfffa245a38002ae3de889a);
+        
+    
+            var measure_control_9270199f609003afeeb72b77dcf84457 = new L.Control.Measure(
+                {
+  "position": "topleft",
+  "primaryLengthUnit": "miles",
+  "secondaryLengthUnit": "miles",
+  "primaryAreaUnit": "sqmeters",
+  "secondaryAreaUnit": "acres",
+});
+            map_a87b2cfb8dfffa245a38002ae3de889a.addControl(measure_control_9270199f609003afeeb72b77dcf84457);
+
+            // Workaround for using this plugin with Leaflet>=1.8.0
+            // https://github.com/ljagis/leaflet-measure/issues/171
+            L.Control.Measure.include({
+                _setCaptureMarkerIcon: function () {
+                    // disable autopan
+                    this._captureMarker.options.autoPanOnFocus = false;
+                    // default function
+                    this._captureMarker.setIcon(
+                        L.divIcon({
+                            iconSize: this._map.getSize().multiplyBy(2)
+                        })
+                    );
+                },
+            });
+
+        
+    
+            var feature_group_39704ac4ebe83cd56884d241719bfa23 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_3d73d6cd8466e1669a73f8601511c032 = L.circleMarker(
+                [33.7468, -117.8554],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 30.0, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_dcb3694a7c738ea963e53748054f49cd = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_c58ff0127fa4b65d409ef9a994373d26 = $(`<div id="html_c58ff0127fa4b65d409ef9a994373d26" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92701 — Santa Ana</b><br>           Unique Seva households: <b>1,504</b><br>           Total visits: <b>7,609</b><br>           Average visits/household: <b>5.06</b><br>           6+ visit households: <b>380 (25.3%)</b><br>           Approx. distance to current site: <b>0.5 mi</b>         </div>         </div>`)[0];
+                popup_dcb3694a7c738ea963e53748054f49cd.setContent(html_c58ff0127fa4b65d409ef9a994373d26);
+            
+        
+
+        circle_marker_3d73d6cd8466e1669a73f8601511c032.bindPopup(popup_dcb3694a7c738ea963e53748054f49cd)
+        ;
+
+        
+    
+    
+            circle_marker_3d73d6cd8466e1669a73f8601511c032.bindTooltip(
+                `<div>
+                     92701: 1,504 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7f5f27a215c18169c5d2d55b627e0e2d = L.circleMarker(
+                [33.7198, -117.9141],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 25.84192852672276, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_3ac9653c2f5ec0b7d216716ae2608f0d = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_190240aef392afb2d2e639c8b9655074 = $(`<div id="html_190240aef392afb2d2e639c8b9655074" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92704 — Santa Ana</b><br>           Unique Seva households: <b>1,028</b><br>           Total visits: <b>4,172</b><br>           Average visits/household: <b>4.06</b><br>           6+ visit households: <b>176 (17.1%)</b><br>           Approx. distance to current site: <b>4.0 mi</b>         </div>         </div>`)[0];
+                popup_3ac9653c2f5ec0b7d216716ae2608f0d.setContent(html_190240aef392afb2d2e639c8b9655074);
+            
+        
+
+        circle_marker_7f5f27a215c18169c5d2d55b627e0e2d.bindPopup(popup_3ac9653c2f5ec0b7d216716ae2608f0d)
+        ;
+
+        
+    
+    
+            circle_marker_7f5f27a215c18169c5d2d55b627e0e2d.bindTooltip(
+                `<div>
+                     92704: 1,028 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_834e27ed2372e87f3f4b4293fe0540d4 = L.circleMarker(
+                [33.7635, -117.7966],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 23.25034689752952, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_b7036c9b3c13b8e2634df0f955fe2cb6 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_4c40c9927932aa6038d779906e2fde7f = $(`<div id="html_4c40c9927932aa6038d779906e2fde7f" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92705 — Santa Ana / North Tustin</b><br>           Unique Seva households: <b>777</b><br>           Total visits: <b>4,063</b><br>           Average visits/household: <b>5.23</b><br>           6+ visit households: <b>183 (23.6%)</b><br>           Approx. distance to current site: <b>3.4 mi</b>         </div>         </div>`)[0];
+                popup_b7036c9b3c13b8e2634df0f955fe2cb6.setContent(html_4c40c9927932aa6038d779906e2fde7f);
+            
+        
+
+        circle_marker_834e27ed2372e87f3f4b4293fe0540d4.bindPopup(popup_b7036c9b3c13b8e2634df0f955fe2cb6)
+        ;
+
+        
+    
+    
+            circle_marker_834e27ed2372e87f3f4b4293fe0540d4.bindTooltip(
+                `<div>
+                     92705: 777 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d6d56355712509395204fbe85d6025ca = L.circleMarker(
+                [33.6966, -117.871],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 22.777644700676184, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_66f795b5438f190ad4fe54a30669879a = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_dad2f93a108c4e109d737a2ce12b9454 = $(`<div id="html_dad2f93a108c4e109d737a2ce12b9454" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92707 — Santa Ana</b><br>           Unique Seva households: <b>735</b><br>           Total visits: <b>3,215</b><br>           Average visits/household: <b>4.37</b><br>           6+ visit households: <b>142 (19.3%)</b><br>           Approx. distance to current site: <b>3.4 mi</b>         </div>         </div>`)[0];
+                popup_66f795b5438f190ad4fe54a30669879a.setContent(html_dad2f93a108c4e109d737a2ce12b9454);
+            
+        
+
+        circle_marker_d6d56355712509395204fbe85d6025ca.bindPopup(popup_66f795b5438f190ad4fe54a30669879a)
+        ;
+
+        
+    
+    
+            circle_marker_d6d56355712509395204fbe85d6025ca.bindTooltip(
+                `<div>
+                     92707: 735 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a9c15b4589078728fc7e7bd107813271 = L.circleMarker(
+                [33.7488, -117.9094],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 21.874507866387546, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_df978b2b68cc8b9a9ebc8eb0831c0481 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_af281d6a8eed76306a332ccbf2b88f3f = $(`<div id="html_af281d6a8eed76306a332ccbf2b88f3f" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92703 — Santa Ana</b><br>           Unique Seva households: <b>658</b><br>           Total visits: <b>2,633</b><br>           Average visits/household: <b>4.00</b><br>           6+ visit households: <b>108 (16.4%)</b><br>           Approx. distance to current site: <b>3.5 mi</b>         </div>         </div>`)[0];
+                popup_df978b2b68cc8b9a9ebc8eb0831c0481.setContent(html_af281d6a8eed76306a332ccbf2b88f3f);
+            
+        
+
+        circle_marker_a9c15b4589078728fc7e7bd107813271.bindPopup(popup_df978b2b68cc8b9a9ebc8eb0831c0481)
+        ;
+
+        
+    
+    
+            circle_marker_a9c15b4589078728fc7e7bd107813271.bindTooltip(
+                `<div>
+                     92703: 658 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_33e68c052f5c9ab5772a5bb1f4103091 = L.circleMarker(
+                [33.7376, -117.8212],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 20.83956757986724, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_c17b9974c6e1f61dc5447c5d4b386580 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_ca86c507266cf31530b5402eb48972a1 = $(`<div id="html_ca86c507266cf31530b5402eb48972a1" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92780 — Tustin</b><br>           Unique Seva households: <b>575</b><br>           Total visits: <b>3,496</b><br>           Average visits/household: <b>6.08</b><br>           6+ visit households: <b>172 (29.9%)</b><br>           Approx. distance to current site: <b>1.7 mi</b>         </div>         </div>`)[0];
+                popup_c17b9974c6e1f61dc5447c5d4b386580.setContent(html_ca86c507266cf31530b5402eb48972a1);
+            
+        
+
+        circle_marker_33e68c052f5c9ab5772a5bb1f4103091.bindPopup(popup_c17b9974c6e1f61dc5447c5d4b386580)
+        ;
+
+        
+    
+    
+            circle_marker_33e68c052f5c9ab5772a5bb1f4103091.bindTooltip(
+                `<div>
+                     92780: 575 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_11ec85f2f22a6565d6428ef3d5eb8367 = L.circleMarker(
+                [33.7676, -117.8817],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 16.593052721356898, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_b17587097c91245db5a958b081dc882a = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_91af77ff72a1ba0d7a4a2c01a62f8e5f = $(`<div id="html_91af77ff72a1ba0d7a4a2c01a62f8e5f" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92706 — Santa Ana</b><br>           Unique Seva households: <b>293</b><br>           Total visits: <b>1,041</b><br>           Average visits/household: <b>3.55</b><br>           6+ visit households: <b>42 (14.3%)</b><br>           Approx. distance to current site: <b>2.5 mi</b>         </div>         </div>`)[0];
+                popup_b17587097c91245db5a958b081dc882a.setContent(html_91af77ff72a1ba0d7a4a2c01a62f8e5f);
+            
+        
+
+        circle_marker_11ec85f2f22a6565d6428ef3d5eb8367.bindPopup(popup_b17587097c91245db5a958b081dc882a)
+        ;
+
+        
+    
+    
+            circle_marker_11ec85f2f22a6565d6428ef3d5eb8367.bindTooltip(
+                `<div>
+                     92706: 293 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a0d8a5fa96eefa10113ddba3ad0a37dd = L.circleMarker(
+                [33.7491, -117.9937],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 11.96799977183275, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_0845499994a24991ba448f323939f35e = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_47b259fd389a516e0736dc8e5d241079 = $(`<div id="html_47b259fd389a516e0736dc8e5d241079" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92683 — Westminster</b><br>           Unique Seva households: <b>93</b><br>           Total visits: <b>503</b><br>           Average visits/household: <b>5.41</b><br>           6+ visit households: <b>20 (21.5%)</b><br>           Approx. distance to current site: <b>8.3 mi</b>         </div>         </div>`)[0];
+                popup_0845499994a24991ba448f323939f35e.setContent(html_47b259fd389a516e0736dc8e5d241079);
+            
+        
+
+        circle_marker_a0d8a5fa96eefa10113ddba3ad0a37dd.bindPopup(popup_0845499994a24991ba448f323939f35e)
+        ;
+
+        
+    
+    
+            circle_marker_a0d8a5fa96eefa10113ddba3ad0a37dd.bindTooltip(
+                `<div>
+                     92683: 93 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6c841e0d654f7e53b50b886a976efaf1 = L.circleMarker(
+                [33.7643, -117.9318],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 11.83824514584466, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_8cfe0a613abcd920db9522cecf0f45f7 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_138c3785626de52609db57a7ffaff564 = $(`<div id="html_138c3785626de52609db57a7ffaff564" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92843 — Garden Grove</b><br>           Unique Seva households: <b>89</b><br>           Total visits: <b>383</b><br>           Average visits/household: <b>4.30</b><br>           6+ visit households: <b>15 (16.9%)</b><br>           Approx. distance to current site: <b>5.0 mi</b>         </div>         </div>`)[0];
+                popup_8cfe0a613abcd920db9522cecf0f45f7.setContent(html_138c3785626de52609db57a7ffaff564);
+            
+        
+
+        circle_marker_6c841e0d654f7e53b50b886a976efaf1.bindPopup(popup_8cfe0a613abcd920db9522cecf0f45f7)
+        ;
+
+        
+    
+    
+            circle_marker_6c841e0d654f7e53b50b886a976efaf1.bindTooltip(
+                `<div>
+                     92843: 89 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8c8f3b65d73c008798a5ebc91e8b818e = L.circleMarker(
+                [33.7101, -117.9477],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 11.140577002136396, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_5f5a71610702b437112337f94de9f5f2 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_9f49c9bbc8ed0ceb6b1b9d684d6545ab = $(`<div id="html_9f49c9bbc8ed0ceb6b1b9d684d6545ab" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92708 — Fountain Valley</b><br>           Unique Seva households: <b>69</b><br>           Total visits: <b>300</b><br>           Average visits/household: <b>4.35</b><br>           6+ visit households: <b>13 (18.8%)</b><br>           Approx. distance to current site: <b>6.1 mi</b>         </div>         </div>`)[0];
+                popup_5f5a71610702b437112337f94de9f5f2.setContent(html_9f49c9bbc8ed0ceb6b1b9d684d6545ab);
+            
+        
+
+        circle_marker_8c8f3b65d73c008798a5ebc91e8b818e.bindPopup(popup_5f5a71610702b437112337f94de9f5f2)
+        ;
+
+        
+    
+    
+            circle_marker_8c8f3b65d73c008798a5ebc91e8b818e.bindTooltip(
+                `<div>
+                     92708: 69 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_893b03c5c0b8b3764e83cea903b71c63 = L.circleMarker(
+                [33.8104, -117.9794],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 11.103190491397452, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_f7eddb96a888d87fc77704d176ffbbff = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_9ac5aa95de8066af16f84e8c2a924a82 = $(`<div id="html_9ac5aa95de8066af16f84e8c2a924a82" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92804 — Anaheim</b><br>           Unique Seva households: <b>68</b><br>           Total visits: <b>295</b><br>           Average visits/household: <b>4.34</b><br>           6+ visit households: <b>12 (17.6%)</b><br>           Approx. distance to current site: <b>8.8 mi</b>         </div>         </div>`)[0];
+                popup_f7eddb96a888d87fc77704d176ffbbff.setContent(html_9ac5aa95de8066af16f84e8c2a924a82);
+            
+        
+
+        circle_marker_893b03c5c0b8b3764e83cea903b71c63.bindPopup(popup_f7eddb96a888d87fc77704d176ffbbff)
+        ;
+
+        
+    
+    
+            circle_marker_893b03c5c0b8b3764e83cea903b71c63.bindTooltip(
+                `<div>
+                     92804: 68 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_298c6d2a2fba649a471efb5f0834357b = L.circleMarker(
+                [33.7886, -117.9277],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10.989350360645822, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_2afd518ce576484bc441e45c9ee140ab = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_72cecdcd4bcef87da455566c8707e56f = $(`<div id="html_72cecdcd4bcef87da455566c8707e56f" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92840 — Garden Grove</b><br>           Unique Seva households: <b>65</b><br>           Total visits: <b>381</b><br>           Average visits/household: <b>5.86</b><br>           6+ visit households: <b>15 (23.1%)</b><br>           Approx. distance to current site: <b>5.5 mi</b>         </div>         </div>`)[0];
+                popup_2afd518ce576484bc441e45c9ee140ab.setContent(html_72cecdcd4bcef87da455566c8707e56f);
+            
+        
+
+        circle_marker_298c6d2a2fba649a471efb5f0834357b.bindPopup(popup_2afd518ce576484bc441e45c9ee140ab)
+        ;
+
+        
+    
+    
+            circle_marker_298c6d2a2fba649a471efb5f0834357b.bindTooltip(
+                `<div>
+                     92840: 65 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_1cff17f506ee300b89e005573d63cab4 = L.circleMarker(
+                [33.7457, -117.8669],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10.793612771621767, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_9da305fae27c37be638f3272b118aa7d = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_b1d886dcb7f6fa9acaa995166d00bb50 = $(`<div id="html_b1d886dcb7f6fa9acaa995166d00bb50" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92702 — Santa Ana</b><br>           Unique Seva households: <b>60</b><br>           Total visits: <b>322</b><br>           Average visits/household: <b>5.37</b><br>           6+ visit households: <b>11 (18.3%)</b><br>           Approx. distance to current site: <b>1.0 mi</b>         </div>         </div>`)[0];
+                popup_9da305fae27c37be638f3272b118aa7d.setContent(html_b1d886dcb7f6fa9acaa995166d00bb50);
+            
+        
+
+        circle_marker_1cff17f506ee300b89e005573d63cab4.bindPopup(popup_9da305fae27c37be638f3272b118aa7d)
+        ;
+
+        
+    
+    
+            circle_marker_1cff17f506ee300b89e005573d63cab4.bindTooltip(
+                `<div>
+                     92702: 60 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_383540e21268e890889731bbf2fd3c45 = L.circleMarker(
+                [33.8263, -117.9105],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10.753498151977244, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_ffa18285defe7a8af7c59224490040cd = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_7200f11469e1442ed1cc6f0da0178777 = $(`<div id="html_7200f11469e1442ed1cc6f0da0178777" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92805 — Anaheim</b><br>           Unique Seva households: <b>59</b><br>           Total visits: <b>315</b><br>           Average visits/household: <b>5.34</b><br>           6+ visit households: <b>15 (25.4%)</b><br>           Approx. distance to current site: <b>6.8 mi</b>         </div>         </div>`)[0];
+                popup_ffa18285defe7a8af7c59224490040cd.setContent(html_7200f11469e1442ed1cc6f0da0178777);
+            
+        
+
+        circle_marker_383540e21268e890889731bbf2fd3c45.bindPopup(popup_ffa18285defe7a8af7c59224490040cd)
+        ;
+
+        
+    
+    
+            circle_marker_383540e21268e890889731bbf2fd3c45.bindTooltip(
+                `<div>
+                     92805: 59 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_06b13bae0921647cdf1aec4d98993a6b = L.circleMarker(
+                [33.8107, -117.9168],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10.631069909927758, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_0a60a235162a1953400af560a6ea5b76 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_c96840d8ed90b303f56070e70d739e5f = $(`<div id="html_c96840d8ed90b303f56070e70d739e5f" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92802 — Anaheim</b><br>           Unique Seva households: <b>56</b><br>           Total visits: <b>243</b><br>           Average visits/household: <b>4.34</b><br>           6+ visit households: <b>12 (21.4%)</b><br>           Approx. distance to current site: <b>6.1 mi</b>         </div>         </div>`)[0];
+                popup_0a60a235162a1953400af560a6ea5b76.setContent(html_c96840d8ed90b303f56070e70d739e5f);
+            
+        
+
+        circle_marker_06b13bae0921647cdf1aec4d98993a6b.bindPopup(popup_0a60a235162a1953400af560a6ea5b76)
+        ;
+
+        
+    
+    
+            circle_marker_06b13bae0921647cdf1aec4d98993a6b.bindTooltip(
+                `<div>
+                     92802: 56 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e1dcc127d9f8382c9666c2c2c30a32b7 = L.circleMarker(
+                [33.7882, -117.8817],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10.287537606062978, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_c92a8e42879cf79db044ec86ae5105de = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_b8ed11b16a0f56a6732b82f288e245bf = $(`<div id="html_b8ed11b16a0f56a6732b82f288e245bf" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92868 — Orange</b><br>           Unique Seva households: <b>48</b><br>           Total visits: <b>195</b><br>           Average visits/household: <b>4.06</b><br>           6+ visit households: <b>8 (16.7%)</b><br>           Approx. distance to current site: <b>3.6 mi</b>         </div>         </div>`)[0];
+                popup_c92a8e42879cf79db044ec86ae5105de.setContent(html_b8ed11b16a0f56a6732b82f288e245bf);
+            
+        
+
+        circle_marker_e1dcc127d9f8382c9666c2c2c30a32b7.bindPopup(popup_c92a8e42879cf79db044ec86ae5105de)
+        ;
+
+        
+    
+    
+            circle_marker_e1dcc127d9f8382c9666c2c2c30a32b7.bindTooltip(
+                `<div>
+                     92868: 48 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c1d01f52a49d97ba717e33066a6aa05f = L.circleMarker(
+                [33.649, -117.9178],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10.287537606062978, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_ddc04044965554d87b2b415d352b21f7 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_714bfe9df71a022a96226bfb13bff62a = $(`<div id="html_714bfe9df71a022a96226bfb13bff62a" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92627 — Costa Mesa</b><br>           Unique Seva households: <b>48</b><br>           Total visits: <b>235</b><br>           Average visits/household: <b>4.90</b><br>           6+ visit households: <b>11 (22.9%)</b><br>           Approx. distance to current site: <b>7.6 mi</b>         </div>         </div>`)[0];
+                popup_ddc04044965554d87b2b415d352b21f7.setContent(html_714bfe9df71a022a96226bfb13bff62a);
+            
+        
+
+        circle_marker_c1d01f52a49d97ba717e33066a6aa05f.bindPopup(popup_ddc04044965554d87b2b415d352b21f7)
+        ;
+
+        
+    
+    
+            circle_marker_c1d01f52a49d97ba717e33066a6aa05f.bindTooltip(
+                `<div>
+                     92627: 48 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9fe00dc0a7aba2b7ba61c31bd41bb5c6 = L.circleMarker(
+                [33.831, -117.8668],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10.287537606062978, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_9922dc9f6b77eb7f24bcb345729d08a5 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_dabec3d4a8b8fcfdefc01ba91bbf5bf8 = $(`<div id="html_dabec3d4a8b8fcfdefc01ba91bbf5bf8" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92806 — Anaheim</b><br>           Unique Seva households: <b>48</b><br>           Total visits: <b>110</b><br>           Average visits/household: <b>2.29</b><br>           6+ visit households: <b>6 (12.5%)</b><br>           Approx. distance to current site: <b>6.2 mi</b>         </div>         </div>`)[0];
+                popup_9922dc9f6b77eb7f24bcb345729d08a5.setContent(html_dabec3d4a8b8fcfdefc01ba91bbf5bf8);
+            
+        
+
+        circle_marker_9fe00dc0a7aba2b7ba61c31bd41bb5c6.bindPopup(popup_9922dc9f6b77eb7f24bcb345729d08a5)
+        ;
+
+        
+    
+    
+            circle_marker_9fe00dc0a7aba2b7ba61c31bd41bb5c6.bindTooltip(
+                `<div>
+                     92806: 48 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_74e5734f8b697c612ac19538830ab0b5 = L.circleMarker(
+                [33.84441, -117.95175],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10.197263546240068, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_28e60be0d6c797cf081c3febd40d4888 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_b27d79682aac00cd44ba294e578f2796 = $(`<div id="html_b27d79682aac00cd44ba294e578f2796" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92801 — Anaheim</b><br>           Unique Seva households: <b>46</b><br>           Total visits: <b>213</b><br>           Average visits/household: <b>4.63</b><br>           6+ visit households: <b>10 (21.7%)</b><br>           Approx. distance to current site: <b>9.2 mi</b>         </div>         </div>`)[0];
+                popup_28e60be0d6c797cf081c3febd40d4888.setContent(html_b27d79682aac00cd44ba294e578f2796);
+            
+        
+
+        circle_marker_74e5734f8b697c612ac19538830ab0b5.bindPopup(popup_28e60be0d6c797cf081c3febd40d4888)
+        ;
+
+        
+    
+    
+            circle_marker_74e5734f8b697c612ac19538830ab0b5.bindTooltip(
+                `<div>
+                     92801: 46 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_327c14810d959b28fdd5b04e6ef0c3f6 = L.circleMarker(
+                [33.7866, -117.9828],
+                {"bubblingMouseEvents": true, "color": "#355C7D", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#4C78A8", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9.913968438320653, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_39704ac4ebe83cd56884d241719bfa23);
+        
+    
+        var popup_ac35065d726535d670aad84b61f847fd = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_9158b3c78188756c3a1711f94d7a23b2 = $(`<div id="html_9158b3c78188756c3a1711f94d7a23b2" style="width: 100.0%; height: 100.0%;">         <div style="font-family:Arial;min-width:230px">           <b>ZIP 92841 — Garden Grove</b><br>           Unique Seva households: <b>40</b><br>           Total visits: <b>247</b><br>           Average visits/household: <b>6.18</b><br>           6+ visit households: <b>12 (30.0%)</b><br>           Approx. distance to current site: <b>8.2 mi</b>         </div>         </div>`)[0];
+                popup_ac35065d726535d670aad84b61f847fd.setContent(html_9158b3c78188756c3a1711f94d7a23b2);
+            
+        
+
+        circle_marker_327c14810d959b28fdd5b04e6ef0c3f6.bindPopup(popup_ac35065d726535d670aad84b61f847fd)
+        ;
+
+        
+    
+    
+            circle_marker_327c14810d959b28fdd5b04e6ef0c3f6.bindTooltip(
+                `<div>
+                     92841: 40 households
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_39704ac4ebe83cd56884d241719bfa23.addTo(map_a87b2cfb8dfffa245a38002ae3de889a);
+        
+    
+            var feature_group_ee5d2b12eae2f8b6fbbf10766bbc9ceb = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var heat_map_cd91173e5c796087be9a7008eba7b093 = L.heatLayer(
+                [[33.7468, -117.8554, 1504.0], [33.7198, -117.9141, 1028.0], [33.7635, -117.7966, 777.0], [33.6966, -117.871, 735.0], [33.7488, -117.9094, 658.0], [33.7376, -117.8212, 575.0], [33.7676, -117.8817, 293.0], [33.7491, -117.9937, 93.0], [33.7643, -117.9318, 89.0], [33.7101, -117.9477, 69.0], [33.8104, -117.9794, 68.0], [33.7886, -117.9277, 65.0], [33.7457, -117.8669, 60.0], [33.8263, -117.9105, 59.0], [33.8107, -117.9168, 56.0], [33.7882, -117.8817, 48.0], [33.649, -117.9178, 48.0], [33.831, -117.8668, 48.0], [33.84441, -117.95175, 46.0], [33.7866, -117.9828, 40.0]],
+                {
+  "minOpacity": 0.25,
+  "maxZoom": 13,
+  "radius": 42,
+  "blur": 30,
+}
+            );
+        
+    
+            heat_map_cd91173e5c796087be9a7008eba7b093.addTo(feature_group_ee5d2b12eae2f8b6fbbf10766bbc9ceb);
+        
+    
+            var feature_group_367762a3184dd86afda496883cb8bbf4 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var marker_97401a9ce591876e3d27946b27ecc084 = L.marker(
+                [33.74269, -117.84937],
+                {
+}
+            ).addTo(feature_group_367762a3184dd86afda496883cb8bbf4);
+        
+    
+            var icon_f536e888fe934d46330642b3d75d2658 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "home",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_ea1bda37361b504c6eb527c7ead802d0 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_e4c6c50f7c191efd99250bfcfd266250 = $(`<div id="html_e4c6c50f7c191efd99250bfcfd266250" style="width: 100.0%; height: 100.0%;"><b>Current Seva site</b><br>1441 E Chestnut Ave, Santa Ana, CA 92701<br><i>Verified current distribution location</i></div>`)[0];
+                popup_ea1bda37361b504c6eb527c7ead802d0.setContent(html_e4c6c50f7c191efd99250bfcfd266250);
+            
+        
+
+        marker_97401a9ce591876e3d27946b27ecc084.bindPopup(popup_ea1bda37361b504c6eb527c7ead802d0)
+        ;
+
+        
+    
+    
+            marker_97401a9ce591876e3d27946b27ecc084.bindTooltip(
+                `<div>
+                     Current Seva distribution site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_97401a9ce591876e3d27946b27ecc084.setIcon(icon_f536e888fe934d46330642b3d75d2658);
+            
+    
+            var marker_e0c2e8b170c1c61817e0d914dc14e412 = L.marker(
+                [33.7198, -117.9141],
+                {
+}
+            ).addTo(feature_group_367762a3184dd86afda496883cb8bbf4);
+        
+    
+            var icon_7ef3070c129d10c9ce7444a006beaed7 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "flag",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_348748ea289ae4dc05409a07aebf4ebd = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_364a018ca711732cab13f87d20ada057 = $(`<div id="html_364a018ca711732cab13f87d20ada057" style="width: 100.0%; height: 100.0%;">             <div style="font-family:Arial;min-width:245px">               <b>Candidate area: Southwest Santa Ana (92704)</b><br>               Scenario point: ZIP centroid, not a proposed facility.<br><br>               Households in mapped ZIPs closer to this point than current site:               <b>2,939</b> (46.2% of mapped households)<br>               Average straight-line distance reduction among those households:               <b>2.24 miles</b>             </div>             </div>`)[0];
+                popup_348748ea289ae4dc05409a07aebf4ebd.setContent(html_364a018ca711732cab13f87d20ada057);
+            
+        
+
+        marker_e0c2e8b170c1c61817e0d914dc14e412.bindPopup(popup_348748ea289ae4dc05409a07aebf4ebd)
+        ;
+
+        
+    
+    
+            marker_e0c2e8b170c1c61817e0d914dc14e412.bindTooltip(
+                `<div>
+                     Candidate area: Southwest Santa Ana (92704)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_e0c2e8b170c1c61817e0d914dc14e412.setIcon(icon_7ef3070c129d10c9ce7444a006beaed7);
+            
+    
+            var marker_92d61d7c503fe8a5c5d3364af96bbd19 = L.marker(
+                [33.7488, -117.9094],
+                {
+}
+            ).addTo(feature_group_367762a3184dd86afda496883cb8bbf4);
+        
+    
+            var icon_d5ec155c15437dfb4093515f22de9726 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "cadetblue",
+  "iconColor": "white",
+  "icon": "flag",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_244f95af561d738009bedab936e55c2f = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_d14967906b9125c84877444299e7a0cb = $(`<div id="html_d14967906b9125c84877444299e7a0cb" style="width: 100.0%; height: 100.0%;">             <div style="font-family:Arial;min-width:245px">               <b>Candidate area: West Santa Ana (92703)</b><br>               Scenario point: ZIP centroid, not a proposed facility.<br><br>               Households in mapped ZIPs closer to this point than current site:               <b>2,660</b> (41.8% of mapped households)<br>               Average straight-line distance reduction among those households:               <b>2.31 miles</b>             </div>             </div>`)[0];
+                popup_244f95af561d738009bedab936e55c2f.setContent(html_d14967906b9125c84877444299e7a0cb);
+            
+        
+
+        marker_92d61d7c503fe8a5c5d3364af96bbd19.bindPopup(popup_244f95af561d738009bedab936e55c2f)
+        ;
+
+        
+    
+    
+            marker_92d61d7c503fe8a5c5d3364af96bbd19.bindTooltip(
+                `<div>
+                     Candidate area: West Santa Ana (92703)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_92d61d7c503fe8a5c5d3364af96bbd19.setIcon(icon_d5ec155c15437dfb4093515f22de9726);
+            
+    
+            var marker_95860355d9fa07eabba4c656b8d60e66 = L.marker(
+                [33.6966, -117.871],
+                {
+}
+            ).addTo(feature_group_367762a3184dd86afda496883cb8bbf4);
+        
+    
+            var icon_17881fa17471347142756149b7f5a3de = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "purple",
+  "iconColor": "white",
+  "icon": "flag",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_eec3d9b082100c8dc2f0584aff69a86c = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_c29f0f365a98a5aeae0948e9efb26405 = $(`<div id="html_c29f0f365a98a5aeae0948e9efb26405" style="width: 100.0%; height: 100.0%;">             <div style="font-family:Arial;min-width:245px">               <b>Candidate area: South Santa Ana (92707)</b><br>               Scenario point: ZIP centroid, not a proposed facility.<br><br>               Households in mapped ZIPs closer to this point than current site:               <b>1,973</b> (31.0% of mapped households)<br>               Average straight-line distance reduction among those households:               <b>2.00 miles</b>             </div>             </div>`)[0];
+                popup_eec3d9b082100c8dc2f0584aff69a86c.setContent(html_c29f0f365a98a5aeae0948e9efb26405);
+            
+        
+
+        marker_95860355d9fa07eabba4c656b8d60e66.bindPopup(popup_eec3d9b082100c8dc2f0584aff69a86c)
+        ;
+
+        
+    
+    
+            marker_95860355d9fa07eabba4c656b8d60e66.bindTooltip(
+                `<div>
+                     Candidate area: South Santa Ana (92707)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_95860355d9fa07eabba4c656b8d60e66.setIcon(icon_17881fa17471347142756149b7f5a3de);
+            
+    
+            var marker_a0cacdba3bdb7279894fa83d0df1db1c = L.marker(
+                [33.7376, -117.8212],
+                {
+}
+            ).addTo(feature_group_367762a3184dd86afda496883cb8bbf4);
+        
+    
+            var icon_2ed9ace055cc539383d7bb83f8036069 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "flag",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_78581324faf533727197c1f055e99167 = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_9e26de900791e6a7afad57f1d7c1b9c0 = $(`<div id="html_9e26de900791e6a7afad57f1d7c1b9c0" style="width: 100.0%; height: 100.0%;">             <div style="font-family:Arial;min-width:245px">               <b>Candidate area: Tustin / east cluster (92780)</b><br>               Scenario point: ZIP centroid, not a proposed facility.<br><br>               Households in mapped ZIPs closer to this point than current site:               <b>1,352</b> (21.3% of mapped households)<br>               Average straight-line distance reduction among those households:               <b>1.32 miles</b>             </div>             </div>`)[0];
+                popup_78581324faf533727197c1f055e99167.setContent(html_9e26de900791e6a7afad57f1d7c1b9c0);
+            
+        
+
+        marker_a0cacdba3bdb7279894fa83d0df1db1c.bindPopup(popup_78581324faf533727197c1f055e99167)
+        ;
+
+        
+    
+    
+            marker_a0cacdba3bdb7279894fa83d0df1db1c.bindTooltip(
+                `<div>
+                     Candidate area: Tustin / east cluster (92780)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_a0cacdba3bdb7279894fa83d0df1db1c.setIcon(icon_2ed9ace055cc539383d7bb83f8036069);
+            
+    
+            feature_group_367762a3184dd86afda496883cb8bbf4.addTo(map_a87b2cfb8dfffa245a38002ae3de889a);
+        
+    
+            var feature_group_d8df6d5a0444a57aa541a33d628dcea3 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_e5f1caeed85284310efce97ae6459bee = L.circleMarker(
+                [33.7468, -117.8554],
+                {"bubblingMouseEvents": true, "color": "#dbeed0ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#dbeed0ff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 7.675, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_663eab230e6251015fc11e18626ed8a9 = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_53114f936d5f1797483b2cc556d72c77 = $(`<div id="html_53114f936d5f1797483b2cc556d72c77" style="width: 100.0%; height: 100.0%;"><b>ZIP 92701</b><br>1,504 households<br>Approx. centroid-to-site distance: <b>0.45 mi</b></div>`)[0];
+                popup_663eab230e6251015fc11e18626ed8a9.setContent(html_53114f936d5f1797483b2cc556d72c77);
+            
+        
+
+        circle_marker_e5f1caeed85284310efce97ae6459bee.bindPopup(popup_663eab230e6251015fc11e18626ed8a9)
+        ;
+
+        
+    
+    
+            circle_marker_e5f1caeed85284310efce97ae6459bee.bindTooltip(
+                `<div>
+                     92701: ~0.5 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c13bebe33f762221f644f5b37884db7e = L.circleMarker(
+                [33.7198, -117.9141],
+                {"bubblingMouseEvents": true, "color": "#f3c46fff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f3c46fff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 13.06, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_b8d5dc251baf3102fb5324c52a087857 = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_b8c7796c4bcbcc110f9a6db1d089c371 = $(`<div id="html_b8c7796c4bcbcc110f9a6db1d089c371" style="width: 100.0%; height: 100.0%;"><b>ZIP 92704</b><br>1,028 households<br>Approx. centroid-to-site distance: <b>4.04 mi</b></div>`)[0];
+                popup_b8d5dc251baf3102fb5324c52a087857.setContent(html_b8c7796c4bcbcc110f9a6db1d089c371);
+            
+        
+
+        circle_marker_c13bebe33f762221f644f5b37884db7e.bindPopup(popup_b8d5dc251baf3102fb5324c52a087857)
+        ;
+
+        
+    
+    
+            circle_marker_c13bebe33f762221f644f5b37884db7e.bindTooltip(
+                `<div>
+                     92704: ~4.0 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8eec48f20ae12d5d7b277cebb401f097 = L.circleMarker(
+                [33.7635, -117.7966],
+                {"bubblingMouseEvents": true, "color": "#eecc81ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#eecc81ff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 12.04, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_00e52d436c19178d7fcfd2b2e208f948 = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_1566c911cff9303b1bd0f12b911f464c = $(`<div id="html_1566c911cff9303b1bd0f12b911f464c" style="width: 100.0%; height: 100.0%;"><b>ZIP 92705</b><br>777 households<br>Approx. centroid-to-site distance: <b>3.36 mi</b></div>`)[0];
+                popup_00e52d436c19178d7fcfd2b2e208f948.setContent(html_1566c911cff9303b1bd0f12b911f464c);
+            
+        
+
+        circle_marker_8eec48f20ae12d5d7b277cebb401f097.bindPopup(popup_00e52d436c19178d7fcfd2b2e208f948)
+        ;
+
+        
+    
+    
+            circle_marker_8eec48f20ae12d5d7b277cebb401f097.bindTooltip(
+                `<div>
+                     92705: ~3.4 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7839c97698b5197f0fea10a1cab32d21 = L.circleMarker(
+                [33.6966, -117.871],
+                {"bubblingMouseEvents": true, "color": "#efcb7fff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#efcb7fff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 12.129999999999999, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_b60309c076e9700ed9f87dad0d325d4b = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_f15d7754be3e932bbd76022d379edf7e = $(`<div id="html_f15d7754be3e932bbd76022d379edf7e" style="width: 100.0%; height: 100.0%;"><b>ZIP 92707</b><br>735 households<br>Approx. centroid-to-site distance: <b>3.42 mi</b></div>`)[0];
+                popup_b60309c076e9700ed9f87dad0d325d4b.setContent(html_f15d7754be3e932bbd76022d379edf7e);
+            
+        
+
+        circle_marker_7839c97698b5197f0fea10a1cab32d21.bindPopup(popup_b60309c076e9700ed9f87dad0d325d4b)
+        ;
+
+        
+    
+    
+            circle_marker_7839c97698b5197f0fea10a1cab32d21.bindTooltip(
+                `<div>
+                     92707: ~3.4 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2a6078e715e96c03c6138c1efc34f53b = L.circleMarker(
+                [33.7488, -117.9094],
+                {"bubblingMouseEvents": true, "color": "#efca7eff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#efca7eff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 12.205, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_07b704826b3df12bfe06fde6a8b4dd52 = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_04c492fcaeba58a8a04679c8208b69dd = $(`<div id="html_04c492fcaeba58a8a04679c8208b69dd" style="width: 100.0%; height: 100.0%;"><b>ZIP 92703</b><br>658 households<br>Approx. centroid-to-site distance: <b>3.47 mi</b></div>`)[0];
+                popup_07b704826b3df12bfe06fde6a8b4dd52.setContent(html_04c492fcaeba58a8a04679c8208b69dd);
+            
+        
+
+        circle_marker_2a6078e715e96c03c6138c1efc34f53b.bindPopup(popup_07b704826b3df12bfe06fde6a8b4dd52)
+        ;
+
+        
+    
+    
+            circle_marker_2a6078e715e96c03c6138c1efc34f53b.bindTooltip(
+                `<div>
+                     92703: ~3.5 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d6ebc9242299fd3a33ab8e0e25440230 = L.circleMarker(
+                [33.7376, -117.8212],
+                {"bubblingMouseEvents": true, "color": "#e3e0afff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e3e0afff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9.49, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_52e81aa966fd295568924d759645e7a1 = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_4dfe62599b851732ef2e57971da46296 = $(`<div id="html_4dfe62599b851732ef2e57971da46296" style="width: 100.0%; height: 100.0%;"><b>ZIP 92780</b><br>575 households<br>Approx. centroid-to-site distance: <b>1.66 mi</b></div>`)[0];
+                popup_52e81aa966fd295568924d759645e7a1.setContent(html_4dfe62599b851732ef2e57971da46296);
+            
+        
+
+        circle_marker_d6ebc9242299fd3a33ab8e0e25440230.bindPopup(popup_52e81aa966fd295568924d759645e7a1)
+        ;
+
+        
+    
+    
+            circle_marker_d6ebc9242299fd3a33ab8e0e25440230.bindTooltip(
+                `<div>
+                     92780: ~1.7 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f5d5b54db30366c16fbc51b9ee60cede = L.circleMarker(
+                [33.7676, -117.8817],
+                {"bubblingMouseEvents": true, "color": "#e9d698ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e9d698ff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10.795, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_95a75dae9d0b7f699cbc7d667eeb6beb = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_c5fbadc1a2dee8f231a0bed898513e36 = $(`<div id="html_c5fbadc1a2dee8f231a0bed898513e36" style="width: 100.0%; height: 100.0%;"><b>ZIP 92706</b><br>293 households<br>Approx. centroid-to-site distance: <b>2.53 mi</b></div>`)[0];
+                popup_95a75dae9d0b7f699cbc7d667eeb6beb.setContent(html_c5fbadc1a2dee8f231a0bed898513e36);
+            
+        
+
+        circle_marker_f5d5b54db30366c16fbc51b9ee60cede.bindPopup(popup_95a75dae9d0b7f699cbc7d667eeb6beb)
+        ;
+
+        
+    
+    
+            circle_marker_f5d5b54db30366c16fbc51b9ee60cede.bindTooltip(
+                `<div>
+                     92706: ~2.5 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_71a5fd21ed5e720fb60be807e50e8131 = L.circleMarker(
+                [33.7491, -117.9937],
+                {"bubblingMouseEvents": true, "color": "#d85f5cff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d85f5cff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 19.450000000000003, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_b2430d3c83a8a65e77f79ffd1f5af475 = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_4fab70682f2cf4d4dd97778d1b95218c = $(`<div id="html_4fab70682f2cf4d4dd97778d1b95218c" style="width: 100.0%; height: 100.0%;"><b>ZIP 92683</b><br>93 households<br>Approx. centroid-to-site distance: <b>8.30 mi</b></div>`)[0];
+                popup_b2430d3c83a8a65e77f79ffd1f5af475.setContent(html_4fab70682f2cf4d4dd97778d1b95218c);
+            
+        
+
+        circle_marker_71a5fd21ed5e720fb60be807e50e8131.bindPopup(popup_b2430d3c83a8a65e77f79ffd1f5af475)
+        ;
+
+        
+    
+    
+            circle_marker_71a5fd21ed5e720fb60be807e50e8131.bindTooltip(
+                `<div>
+                     92683: ~8.3 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f02b509a2b1c1878a0fffa09c0979c1e = L.circleMarker(
+                [33.7643, -117.9318],
+                {"bubblingMouseEvents": true, "color": "#f3b35fff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f3b35fff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 14.455, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_6996506aae7d9a6808d0c4bde4f38e6a = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_3a00735259049e4a1eff3e23d8cc8fd5 = $(`<div id="html_3a00735259049e4a1eff3e23d8cc8fd5" style="width: 100.0%; height: 100.0%;"><b>ZIP 92843</b><br>89 households<br>Approx. centroid-to-site distance: <b>4.97 mi</b></div>`)[0];
+                popup_6996506aae7d9a6808d0c4bde4f38e6a.setContent(html_3a00735259049e4a1eff3e23d8cc8fd5);
+            
+        
+
+        circle_marker_f02b509a2b1c1878a0fffa09c0979c1e.bindPopup(popup_6996506aae7d9a6808d0c4bde4f38e6a)
+        ;
+
+        
+    
+    
+            circle_marker_f02b509a2b1c1878a0fffa09c0979c1e.bindTooltip(
+                `<div>
+                     92843: ~5.0 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_37d3ef4d3b8a14f08883ffee403d1435 = L.circleMarker(
+                [33.7101, -117.9477],
+                {"bubblingMouseEvents": true, "color": "#ea975eff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ea975eff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 16.12, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_29ae790c4d4e2c6625c620231f021e8e = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_be82a2926f12c13c690e34ca043ea4d2 = $(`<div id="html_be82a2926f12c13c690e34ca043ea4d2" style="width: 100.0%; height: 100.0%;"><b>ZIP 92708</b><br>69 households<br>Approx. centroid-to-site distance: <b>6.08 mi</b></div>`)[0];
+                popup_29ae790c4d4e2c6625c620231f021e8e.setContent(html_be82a2926f12c13c690e34ca043ea4d2);
+            
+        
+
+        circle_marker_37d3ef4d3b8a14f08883ffee403d1435.bindPopup(popup_29ae790c4d4e2c6625c620231f021e8e)
+        ;
+
+        
+    
+    
+            circle_marker_37d3ef4d3b8a14f08883ffee403d1435.bindTooltip(
+                `<div>
+                     92708: ~6.1 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_aff1c8cfdae82e65ddf74358a4376dae = L.circleMarker(
+                [33.8104, -117.9794],
+                {"bubblingMouseEvents": true, "color": "#d4525bff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d4525bff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 20.215, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_4a916d84a2685788f2d450ce8b2104b8 = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_98c2361d484782ee8867bfd90ec44277 = $(`<div id="html_98c2361d484782ee8867bfd90ec44277" style="width: 100.0%; height: 100.0%;"><b>ZIP 92804</b><br>68 households<br>Approx. centroid-to-site distance: <b>8.81 mi</b></div>`)[0];
+                popup_4a916d84a2685788f2d450ce8b2104b8.setContent(html_98c2361d484782ee8867bfd90ec44277);
+            
+        
+
+        circle_marker_aff1c8cfdae82e65ddf74358a4376dae.bindPopup(popup_4a916d84a2685788f2d450ce8b2104b8)
+        ;
+
+        
+    
+    
+            circle_marker_aff1c8cfdae82e65ddf74358a4376dae.bindTooltip(
+                `<div>
+                     92804: ~8.8 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a1992f5dc862ad193759dd114d063fb5 = L.circleMarker(
+                [33.7886, -117.9277],
+                {"bubblingMouseEvents": true, "color": "#efa65fff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#efa65fff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 15.25, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_71664df79bf698de84011c3b16732ef4 = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_e89e14c0c2d5816a3e01ccfb84004da7 = $(`<div id="html_e89e14c0c2d5816a3e01ccfb84004da7" style="width: 100.0%; height: 100.0%;"><b>ZIP 92840</b><br>65 households<br>Approx. centroid-to-site distance: <b>5.50 mi</b></div>`)[0];
+                popup_71664df79bf698de84011c3b16732ef4.setContent(html_e89e14c0c2d5816a3e01ccfb84004da7);
+            
+        
+
+        circle_marker_a1992f5dc862ad193759dd114d063fb5.bindPopup(popup_71664df79bf698de84011c3b16732ef4)
+        ;
+
+        
+    
+    
+            circle_marker_a1992f5dc862ad193759dd114d063fb5.bindTooltip(
+                `<div>
+                     92840: ~5.5 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9776d5f7c8c7ecb069d4849e02ac9e8d = L.circleMarker(
+                [33.7457, -117.8669],
+                {"bubblingMouseEvents": true, "color": "#dfe7c0ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#dfe7c0ff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8.545, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_f5c08a26dfae113ad38f0f827fc1bf50 = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_803e071b4d728ddd31113c0fb6043254 = $(`<div id="html_803e071b4d728ddd31113c0fb6043254" style="width: 100.0%; height: 100.0%;"><b>ZIP 92702</b><br>60 households<br>Approx. centroid-to-site distance: <b>1.03 mi</b></div>`)[0];
+                popup_f5c08a26dfae113ad38f0f827fc1bf50.setContent(html_803e071b4d728ddd31113c0fb6043254);
+            
+        
+
+        circle_marker_9776d5f7c8c7ecb069d4849e02ac9e8d.bindPopup(popup_f5c08a26dfae113ad38f0f827fc1bf50)
+        ;
+
+        
+    
+    
+            circle_marker_9776d5f7c8c7ecb069d4849e02ac9e8d.bindTooltip(
+                `<div>
+                     92702: ~1.0 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a1d71a623010ba3c5d3b5c5690c08b09 = L.circleMarker(
+                [33.8263, -117.9105],
+                {"bubblingMouseEvents": true, "color": "#e5865dff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e5865dff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 17.14, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_b79a4e566dafeaf67797154d44aad9ee = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_d2c169b87b75594b2d8b5f9f15e01675 = $(`<div id="html_d2c169b87b75594b2d8b5f9f15e01675" style="width: 100.0%; height: 100.0%;"><b>ZIP 92805</b><br>59 households<br>Approx. centroid-to-site distance: <b>6.76 mi</b></div>`)[0];
+                popup_b79a4e566dafeaf67797154d44aad9ee.setContent(html_d2c169b87b75594b2d8b5f9f15e01675);
+            
+        
+
+        circle_marker_a1d71a623010ba3c5d3b5c5690c08b09.bindPopup(popup_b79a4e566dafeaf67797154d44aad9ee)
+        ;
+
+        
+    
+    
+            circle_marker_a1d71a623010ba3c5d3b5c5690c08b09.bindTooltip(
+                `<div>
+                     92805: ~6.8 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_28ab8ea5bd44e1fb9d528d8f4fb1b22c = L.circleMarker(
+                [33.8107, -117.9168],
+                {"bubblingMouseEvents": true, "color": "#ea975eff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ea975eff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 16.134999999999998, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_2b942007e4652cf769bbf153d800a4d3 = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_0a4b8815e30a8f12ab95205c1525fc83 = $(`<div id="html_0a4b8815e30a8f12ab95205c1525fc83" style="width: 100.0%; height: 100.0%;"><b>ZIP 92802</b><br>56 households<br>Approx. centroid-to-site distance: <b>6.09 mi</b></div>`)[0];
+                popup_2b942007e4652cf769bbf153d800a4d3.setContent(html_0a4b8815e30a8f12ab95205c1525fc83);
+            
+        
+
+        circle_marker_28ab8ea5bd44e1fb9d528d8f4fb1b22c.bindPopup(popup_2b942007e4652cf769bbf153d800a4d3)
+        ;
+
+        
+    
+    
+            circle_marker_28ab8ea5bd44e1fb9d528d8f4fb1b22c.bindTooltip(
+                `<div>
+                     92802: ~6.1 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4a593cba1d6eea962e0d6dd64a087b31 = L.circleMarker(
+                [33.7882, -117.8817],
+                {"bubblingMouseEvents": true, "color": "#f0c879ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f0c879ff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 12.475, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_292e4bf96b7de2777cb133325f1419c9 = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_878f1787a2bc57a7e2ad2a3c785557e4 = $(`<div id="html_878f1787a2bc57a7e2ad2a3c785557e4" style="width: 100.0%; height: 100.0%;"><b>ZIP 92868</b><br>48 households<br>Approx. centroid-to-site distance: <b>3.65 mi</b></div>`)[0];
+                popup_292e4bf96b7de2777cb133325f1419c9.setContent(html_878f1787a2bc57a7e2ad2a3c785557e4);
+            
+        
+
+        circle_marker_4a593cba1d6eea962e0d6dd64a087b31.bindPopup(popup_292e4bf96b7de2777cb133325f1419c9)
+        ;
+
+        
+    
+    
+            circle_marker_4a593cba1d6eea962e0d6dd64a087b31.bindTooltip(
+                `<div>
+                     92868: ~3.6 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_474d011b2086852dc7e44a246227c7e7 = L.circleMarker(
+                [33.649, -117.9178],
+                {"bubblingMouseEvents": true, "color": "#de715dff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#de715dff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 18.355, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_be4cdb6ab92ae0819c1220ddd7e9dc1b = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_47aa655d337ff5b5eb3afeae4afd69de = $(`<div id="html_47aa655d337ff5b5eb3afeae4afd69de" style="width: 100.0%; height: 100.0%;"><b>ZIP 92627</b><br>48 households<br>Approx. centroid-to-site distance: <b>7.57 mi</b></div>`)[0];
+                popup_be4cdb6ab92ae0819c1220ddd7e9dc1b.setContent(html_47aa655d337ff5b5eb3afeae4afd69de);
+            
+        
+
+        circle_marker_474d011b2086852dc7e44a246227c7e7.bindPopup(popup_be4cdb6ab92ae0819c1220ddd7e9dc1b)
+        ;
+
+        
+    
+    
+            circle_marker_474d011b2086852dc7e44a246227c7e7.bindTooltip(
+                `<div>
+                     92627: ~7.6 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_1592f1d445ed7da3d5804659c6152813 = L.circleMarker(
+                [33.831, -117.8668],
+                {"bubblingMouseEvents": true, "color": "#e9955eff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e9955eff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 16.27, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_7e7492cf5f77e22610bfd01ba97bf620 = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_2423f12c21044415eae695967a162c15 = $(`<div id="html_2423f12c21044415eae695967a162c15" style="width: 100.0%; height: 100.0%;"><b>ZIP 92806</b><br>48 households<br>Approx. centroid-to-site distance: <b>6.18 mi</b></div>`)[0];
+                popup_7e7492cf5f77e22610bfd01ba97bf620.setContent(html_2423f12c21044415eae695967a162c15);
+            
+        
+
+        circle_marker_1592f1d445ed7da3d5804659c6152813.bindPopup(popup_7e7492cf5f77e22610bfd01ba97bf620)
+        ;
+
+        
+    
+    
+            circle_marker_1592f1d445ed7da3d5804659c6152813.bindTooltip(
+                `<div>
+                     92806: ~6.2 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4773f381b00698e368ba108d9de43cc9 = L.circleMarker(
+                [33.84441, -117.95175],
+                {"bubblingMouseEvents": true, "color": "#d1495bff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d1495bff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 20.740000000000002, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_561f7c66f72829ace9c7623be9c23a21 = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_4e043f4a718f7821a2e763a714131a34 = $(`<div id="html_4e043f4a718f7821a2e763a714131a34" style="width: 100.0%; height: 100.0%;"><b>ZIP 92801</b><br>46 households<br>Approx. centroid-to-site distance: <b>9.16 mi</b></div>`)[0];
+                popup_561f7c66f72829ace9c7623be9c23a21.setContent(html_4e043f4a718f7821a2e763a714131a34);
+            
+        
+
+        circle_marker_4773f381b00698e368ba108d9de43cc9.bindPopup(popup_561f7c66f72829ace9c7623be9c23a21)
+        ;
+
+        
+    
+    
+            circle_marker_4773f381b00698e368ba108d9de43cc9.bindTooltip(
+                `<div>
+                     92801: ~9.2 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7badf2c2f13e0093359e69a3c9c0479a = L.circleMarker(
+                [33.7866, -117.9828],
+                {"bubblingMouseEvents": true, "color": "#d9605cff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d9605cff", "fillOpacity": 0.55, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 19.36, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d8df6d5a0444a57aa541a33d628dcea3);
+        
+    
+        var popup_19121ead896bf477b2e5f2f35086a61d = L.popup({
+  "maxWidth": 260,
+});
+
+        
+            
+                var html_634b13156df9d97ba8232041d2b93d3f = $(`<div id="html_634b13156df9d97ba8232041d2b93d3f" style="width: 100.0%; height: 100.0%;"><b>ZIP 92841</b><br>40 households<br>Approx. centroid-to-site distance: <b>8.24 mi</b></div>`)[0];
+                popup_19121ead896bf477b2e5f2f35086a61d.setContent(html_634b13156df9d97ba8232041d2b93d3f);
+            
+        
+
+        circle_marker_7badf2c2f13e0093359e69a3c9c0479a.bindPopup(popup_19121ead896bf477b2e5f2f35086a61d)
+        ;
+
+        
+    
+    
+            circle_marker_7badf2c2f13e0093359e69a3c9c0479a.bindTooltip(
+                `<div>
+                     92841: ~8.2 mi to current site
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+    var color_map_58f8d6c33219ba0d2d9508fdbb978240 = {};
+
+    
+    color_map_58f8d6c33219ba0d2d9508fdbb978240.color = d3.scale.threshold()
+              .domain([0.0, 0.01835671342685371, 0.03671342685370742, 0.055070140280561126, 0.07342685370741484, 0.09178356713426854, 0.11014028056112225, 0.12849699398797595, 0.14685370741482967, 0.16521042084168336, 0.18356713426853707, 0.2019238476953908, 0.2202805611222445, 0.2386372745490982, 0.2569939879759519, 0.2753507014028056, 0.29370741482965934, 0.31206412825651303, 0.3304208416833667, 0.3487775551102204, 0.36713426853707415, 0.3854909819639279, 0.4038476953907816, 0.42220440881763527, 0.440561122244489, 0.4589178356713427, 0.4772745490981964, 0.4956312625250501, 0.5139879759519038, 0.5323446893787575, 0.5507014028056112, 0.5690581162324649, 0.5874148296593187, 0.6057715430861724, 0.6241282565130261, 0.6424849699398798, 0.6608416833667334, 0.6791983967935872, 0.6975551102204408, 0.7159118236472946, 0.7342685370741483, 0.752625250501002, 0.7709819639278558, 0.7893386773547094, 0.8076953907815632, 0.8260521042084168, 0.8444088176352705, 0.8627655310621242, 0.881122244488978, 0.8994789579158318, 0.9178356713426854, 0.9361923847695391, 0.9545490981963928, 0.9729058116232465, 0.9912625250501002, 1.009619238476954, 1.0279759519038076, 1.0463326653306613, 1.064689378757515, 1.0830460921843688, 1.1014028056112224, 1.119759519038076, 1.1381162324649299, 1.1564729458917837, 1.1748296593186374, 1.193186372745491, 1.2115430861723449, 1.2298997995991985, 1.2482565130260521, 1.2666132264529057, 1.2849699398797596, 1.3033266533066132, 1.3216833667334669, 1.3400400801603207, 1.3583967935871744, 1.376753507014028, 1.3951102204408816, 1.4134669338677355, 1.431823647294589, 1.450180360721443, 1.4685370741482966, 1.4868937875751504, 1.505250501002004, 1.5236072144288577, 1.5419639278557116, 1.5603206412825652, 1.5786773547094188, 1.5970340681362725, 1.6153907815631263, 1.63374749498998, 1.6521042084168336, 1.6704609218436874, 1.688817635270541, 1.7071743486973947, 1.7255310621242483, 1.7438877755511022, 1.762244488977956, 1.7806012024048097, 1.7989579158316635, 1.8173146292585172, 1.8356713426853708, 1.8540280561122244, 1.8723847695390783, 1.890741482965932, 1.9090981963927856, 1.9274549098196394, 1.945811623246493, 1.9641683366733467, 1.9825250501002003, 2.000881763527054, 2.019238476953908, 2.0375951903807614, 2.0559519038076153, 2.0743086172344687, 2.0926653306613225, 2.1110220440881764, 2.12937875751503, 2.1477354709418837, 2.1660921843687375, 2.184448897795591, 2.202805611222445, 2.2211623246492986, 2.239519038076152, 2.2578757515030063, 2.2762324649298598, 2.2945891783567136, 2.3129458917835675, 2.331302605210421, 2.3496593186372747, 2.3680160320641286, 2.386372745490982, 2.404729458917836, 2.4230861723446897, 2.441442885771543, 2.459799599198397, 2.4781563126252504, 2.4965130260521042, 2.514869739478958, 2.5332264529058115, 2.5515831663326654, 2.569939879759519, 2.5882965931863726, 2.6066533066132265, 2.6250100200400803, 2.6433667334669337, 2.6617234468937876, 2.6800801603206414, 2.698436873747495, 2.7167935871743487, 2.735150300601202, 2.753507014028056, 2.77186372745491, 2.7902204408817632, 2.808577154308617, 2.826933867735471, 2.8452905811623244, 2.863647294589178, 2.8820040080160325, 2.900360721442886, 2.91871743486974, 2.937074148296593, 2.955430861723447, 2.973787575150301, 2.9921442885771543, 3.010501002004008, 3.028857715430862, 3.0472144288577154, 3.0655711422845693, 3.083927855711423, 3.1022845691382765, 3.1206412825651304, 3.1389979959919843, 3.1573547094188377, 3.1757114228456915, 3.194068136272545, 3.212424849699399, 3.2307815631262526, 3.249138276553106, 3.26749498997996, 3.2858517034068138, 3.304208416833667, 3.322565130260521, 3.340921843687375, 3.3592785571142283, 3.377635270541082, 3.395991983967936, 3.4143486973947894, 3.4327054108216433, 3.4510621242484967, 3.4694188376753505, 3.4877755511022044, 3.506132264529058, 3.524488977955912, 3.542845691382766, 3.5612024048096194, 3.579559118236473, 3.597915831663327, 3.6162725450901805, 3.6346292585170343, 3.6529859719438877, 3.6713426853707416, 3.6896993987975955, 3.708056112224449, 3.7264128256513027, 3.7447695390781566, 3.76312625250501, 3.781482965931864, 3.7998396793587177, 3.818196392785571, 3.836553106212425, 3.854909819639279, 3.8732665330661322, 3.891623246492986, 3.9099799599198395, 3.9283366733466933, 3.946693386773547, 3.9650501002004006, 3.9834068136272545, 4.001763527054108, 4.020120240480962, 4.038476953907816, 4.056833667334669, 4.075190380761523, 4.093547094188377, 4.1119038076152306, 4.130260521042084, 4.148617234468937, 4.166973947895792, 4.185330661322645, 4.2036873747494985, 4.222044088176353, 4.240400801603206, 4.25875751503006, 4.277114228456914, 4.295470941883767, 4.313827655310621, 4.332184368737475, 4.350541082164328, 4.368897795591182, 4.387254509018036, 4.40561122244489, 4.423967935871743, 4.442324649298597, 4.460681362725451, 4.479038076152304, 4.497394789579158, 4.515751503006013, 4.534108216432866, 4.5524649298597195, 4.570821643286574, 4.589178356713427, 4.607535070140281, 4.625891783567135, 4.644248496993988, 4.662605210420842, 4.680961923847696, 4.6993186372745495, 4.717675350701403, 4.736032064128257, 4.754388777555111, 4.772745490981964, 4.791102204408818, 4.809458917835672, 4.827815631262525, 4.846172344689379, 4.864529058116233, 4.882885771543086, 4.9012424849699405, 4.919599198396794, 4.937955911823647, 4.956312625250501, 4.974669338677355, 4.9930260521042085, 5.011382765531062, 5.029739478957916, 5.04809619238477, 5.066452905811623, 5.084809619238477, 5.103166332665331, 5.121523046092184, 5.139879759519038, 5.158236472945892, 5.176593186372745, 5.1949498997995995, 5.213306613226453, 5.231663326653306, 5.250020040080161, 5.268376753507014, 5.2867334669338675, 5.305090180360722, 5.323446893787575, 5.341803607214429, 5.360160320641283, 5.378517034068136, 5.39687374749499, 5.415230460921843, 5.433587174348697, 5.451943887775551, 5.470300601202404, 5.4886573146292585, 5.507014028056112, 5.525370741482965, 5.54372745490982, 5.562084168336673, 5.5804408817635265, 5.598797595190381, 5.617154308617234, 5.635511022044088, 5.653867735470942, 5.672224448897795, 5.690581162324649, 5.708937875751503, 5.727294589178356, 5.74565130260521, 5.764008016032065, 5.782364729458918, 5.800721442885772, 5.819078156312626, 5.83743486973948, 5.855791583166333, 5.874148296593186, 5.892505010020041, 5.910861723446894, 5.9292184368737475, 5.947575150300602, 5.965931863727455, 5.984288577154309, 6.002645290581163, 6.021002004008016, 6.03935871743487, 6.057715430861724, 6.0760721442885774, 6.094428857715431, 6.112785571142285, 6.131142284569139, 6.149498997995992, 6.167855711422846, 6.1862124248497, 6.204569138276553, 6.222925851703407, 6.241282565130261, 6.259639278557114, 6.2779959919839685, 6.296352705410822, 6.314709418837675, 6.33306613226453, 6.351422845691383, 6.3697795591182365, 6.38813627254509, 6.406492985971944, 6.424849699398798, 6.443206412825651, 6.461563126252505, 6.479919839679359, 6.498276553106212, 6.516633266533066, 6.53498997995992, 6.553346693386773, 6.5717034068136275, 6.590060120240481, 6.608416833667334, 6.626773547094189, 6.645130260521042, 6.6634869739478955, 6.68184368737475, 6.700200400801603, 6.718557114228457, 6.736913827655311, 6.755270541082164, 6.773627254509018, 6.791983967935872, 6.810340681362725, 6.828697394789579, 6.847054108216432, 6.8654108216432865, 6.88376753507014, 6.902124248496993, 6.920480961923848, 6.938837675350701, 6.9571943887775545, 6.975551102204409, 6.993907815631262, 7.012264529058116, 7.030621242484971, 7.048977955911824, 7.067334669338678, 7.085691382765532, 7.104048096192385, 7.122404809619239, 7.140761523046093, 7.159118236472946, 7.1774749498998, 7.195831663326654, 7.2141883767535075, 7.232545090180361, 7.250901803607215, 7.269258517034069, 7.287615230460922, 7.3059719438877755, 7.32432865731463, 7.342685370741483, 7.361042084168337, 7.379398797595191, 7.397755511022044, 7.416112224448898, 7.434468937875752, 7.452825651302605, 7.471182364729459, 7.489539078156313, 7.507895791583167, 7.52625250501002, 7.544609218436874, 7.562965931863728, 7.581322645290581, 7.599679358717435, 7.618036072144289, 7.636392785571142, 7.6547494989979965, 7.67310621242485, 7.691462925851703, 7.709819639278558, 7.728176352705411, 7.7465330661322644, 7.764889779559118, 7.783246492985972, 7.801603206412826, 7.819959919839679, 7.838316633266533, 7.856673346693387, 7.87503006012024, 7.893386773547094, 7.911743486973948, 7.930100200400801, 7.9484569138276555, 7.966813627254509, 7.985170340681362, 8.003527054108217, 8.021883767535071, 8.040240480961923, 8.058597194388778, 8.076953907815632, 8.095310621242485, 8.113667334669339, 8.132024048096193, 8.150380761523046, 8.1687374749499, 8.187094188376754, 8.205450901803607, 8.223807615230461, 8.242164328657315, 8.260521042084168, 8.278877755511022, 8.297234468937875, 8.31559118236473, 8.333947895791583, 8.352304609218438, 8.37066132264529, 8.389018036072144, 8.407374749498997, 8.425731462925853, 8.444088176352706, 8.46244488977956, 8.480801603206412, 8.499158316633267, 8.51751503006012, 8.535871743486974, 8.554228456913828, 8.572585170340682, 8.590941883767535, 8.609298597194389, 8.627655310621241, 8.646012024048096, 8.66436873747495, 8.682725450901804, 8.701082164328657, 8.719438877755511, 8.737795591182364, 8.756152304609218, 8.774509018036072, 8.792865731462927, 8.81122244488978, 8.829579158316633, 8.847935871743486, 8.86629258517034, 8.884649298597195, 8.903006012024049, 8.921362725450901, 8.939719438877756, 8.958076152304608, 8.976432865731462, 8.994789579158317, 9.013146292585171, 9.031503006012025, 9.049859719438878, 9.068216432865732, 9.086573146292585, 9.104929859719439, 9.123286573146293, 9.141643286573148, 9.16])
+              .range(['#d8f3dcff', '#d8f3dcff', '#d9f3dbff', '#d9f3dbff', '#d9f3daff', '#d9f2daff', '#d9f2d9ff', '#d9f2d9ff', '#d9f2d8ff', '#d9f1d8ff', '#daf1d7ff', '#daf1d7ff', '#daf1d6ff', '#daf1d6ff', '#daf0d5ff', '#daf0d5ff', '#daf0d4ff', '#daf0d4ff', '#dbf0d3ff', '#dbefd3ff', '#dbefd2ff', '#dbefd2ff', '#dbefd1ff', '#dbeed1ff', '#dbeed0ff', '#dbeed0ff', '#dbeecfff', '#dceecfff', '#dcedceff', '#dcedceff', '#dcedcdff', '#dcedcdff', '#dcecccff', '#dcecccff', '#dceccbff', '#ddeccbff', '#ddeccaff', '#ddebcaff', '#ddebc9ff', '#ddebc9ff', '#ddebc8ff', '#ddebc8ff', '#ddeac7ff', '#deeac7ff', '#deeac6ff', '#deeac6ff', '#dee9c5ff', '#dee9c5ff', '#dee9c4ff', '#dee9c4ff', '#dee9c3ff', '#dfe8c3ff', '#dfe8c2ff', '#dfe8c2ff', '#dfe8c1ff', '#dfe8c1ff', '#dfe7c0ff', '#dfe7c0ff', '#dfe7bfff', '#dfe7bfff', '#e0e6beff', '#e0e6beff', '#e0e6bdff', '#e0e6bdff', '#e0e6bcff', '#e0e5bcff', '#e0e5bbff', '#e0e5bbff', '#e1e5baff', '#e1e4baff', '#e1e4b9ff', '#e1e4b9ff', '#e1e4b8ff', '#e1e4b8ff', '#e1e3b7ff', '#e1e3b7ff', '#e2e3b6ff', '#e2e3b6ff', '#e2e3b5ff', '#e2e2b5ff', '#e2e2b4ff', '#e2e2b4ff', '#e2e2b3ff', '#e2e1b3ff', '#e2e1b2ff', '#e3e1b2ff', '#e3e1b1ff', '#e3e1b1ff', '#e3e0b0ff', '#e3e0b0ff', '#e3e0afff', '#e3e0afff', '#e3dfaeff', '#e4dfaeff', '#e4dfadff', '#e4dfadff', '#e4dfacff', '#e4deacff', '#e4deabff', '#e4deabff', '#e4deaaff', '#e5deaaff', '#e5dda9ff', '#e5dda9ff', '#e5dda8ff', '#e5dda8ff', '#e5dca7ff', '#e5dca7ff', '#e5dca6ff', '#e6dca6ff', '#e6dca5ff', '#e6dba5ff', '#e6dba4ff', '#e6dba4ff', '#e6dba3ff', '#e6daa3ff', '#e6daa2ff', '#e6daa2ff', '#e7daa1ff', '#e7daa1ff', '#e7d9a0ff', '#e7d9a0ff', '#e7d99fff', '#e7d99fff', '#e7d99eff', '#e7d89eff', '#e8d89dff', '#e8d89dff', '#e8d89cff', '#e8d79cff', '#e8d79cff', '#e8d79bff', '#e8d79bff', '#e8d79aff', '#e9d69aff', '#e9d699ff', '#e9d699ff', '#e9d698ff', '#e9d598ff', '#e9d597ff', '#e9d597ff', '#e9d596ff', '#e9d596ff', '#ead495ff', '#ead495ff', '#ead494ff', '#ead494ff', '#ead493ff', '#ead393ff', '#ead392ff', '#ead392ff', '#ebd391ff', '#ebd291ff', '#ebd290ff', '#ebd290ff', '#ebd28fff', '#ebd28fff', '#ebd18eff', '#ebd18eff', '#ecd18dff', '#ecd18dff', '#ecd08cff', '#ecd08cff', '#ecd08bff', '#ecd08bff', '#ecd08aff', '#eccf8aff', '#edcf89ff', '#edcf89ff', '#edcf88ff', '#edcf88ff', '#edce87ff', '#edce87ff', '#edce86ff', '#edce86ff', '#edcd85ff', '#eecd85ff', '#eecd84ff', '#eecd84ff', '#eecd83ff', '#eecc83ff', '#eecc82ff', '#eecc82ff', '#eecc81ff', '#efcb81ff', '#efcb80ff', '#efcb80ff', '#efcb7fff', '#efcb7fff', '#efca7eff', '#efca7eff', '#efca7dff', '#f0ca7dff', '#f0ca7cff', '#f0c97cff', '#f0c97bff', '#f0c97bff', '#f0c97aff', '#f0c87aff', '#f0c879ff', '#f0c879ff', '#f1c878ff', '#f1c878ff', '#f1c777ff', '#f1c777ff', '#f1c776ff', '#f1c776ff', '#f1c675ff', '#f1c675ff', '#f2c674ff', '#f2c674ff', '#f2c673ff', '#f2c573ff', '#f2c572ff', '#f2c572ff', '#f2c571ff', '#f2c571ff', '#f3c470ff', '#f3c470ff', '#f3c46fff', '#f3c46fff', '#f3c36eff', '#f3c36eff', '#f3c36dff', '#f3c36dff', '#f4c36cff', '#f4c26cff', '#f4c26bff', '#f4c26bff', '#f4c26aff', '#f4c16aff', '#f4c169ff', '#f4c169ff', '#f4c168ff', '#f5c168ff', '#f5c067ff', '#f5c067ff', '#f5c066ff', '#f5c066ff', '#f5c065ff', '#f5bf65ff', '#f5bf64ff', '#f6bf64ff', '#f6bf63ff', '#f6be63ff', '#f6be62ff', '#f6be62ff', '#f6be61ff', '#f6be61ff', '#f6bd60ff', '#f6bd60ff', '#f6bd60ff', '#f6bc60ff', '#f6bc60ff', '#f6bb60ff', '#f6bb60ff', '#f5ba60ff', '#f5ba60ff', '#f5b960ff', '#f5b960ff', '#f5b860ff', '#f5b860ff', '#f5b760ff', '#f4b760ff', '#f4b660ff', '#f4b660ff', '#f4b660ff', '#f4b560ff', '#f4b560ff', '#f4b45fff', '#f3b45fff', '#f3b35fff', '#f3b35fff', '#f3b25fff', '#f3b25fff', '#f3b15fff', '#f3b15fff', '#f2b05fff', '#f2b05fff', '#f2af5fff', '#f2af5fff', '#f2af5fff', '#f2ae5fff', '#f1ae5fff', '#f1ad5fff', '#f1ad5fff', '#f1ac5fff', '#f1ac5fff', '#f1ab5fff', '#f1ab5fff', '#f0aa5fff', '#f0aa5fff', '#f0a95fff', '#f0a95fff', '#f0a85fff', '#f0a85fff', '#f0a85fff', '#efa75fff', '#efa75fff', '#efa65fff', '#efa65fff', '#efa55fff', '#efa55fff', '#eea45fff', '#eea45fff', '#eea35fff', '#eea35fff', '#eea25fff', '#eea25fff', '#eea15fff', '#eda15fff', '#eda15fff', '#eda05fff', '#eda05fff', '#ed9f5fff', '#ed9f5fff', '#ed9e5fff', '#ec9e5fff', '#ec9d5eff', '#ec9d5eff', '#ec9c5eff', '#ec9c5eff', '#ec9b5eff', '#ec9b5eff', '#eb9a5eff', '#eb9a5eff', '#eb9a5eff', '#eb995eff', '#eb995eff', '#eb985eff', '#ea985eff', '#ea975eff', '#ea975eff', '#ea965eff', '#ea965eff', '#ea955eff', '#ea955eff', '#e9945eff', '#e9945eff', '#e9935eff', '#e9935eff', '#e9935eff', '#e9925eff', '#e9925eff', '#e8915eff', '#e8915eff', '#e8905eff', '#e8905eff', '#e88f5eff', '#e88f5eff', '#e88e5eff', '#e78e5eff', '#e78d5eff', '#e78d5eff', '#e78c5eff', '#e78c5eff', '#e78c5eff', '#e68b5eff', '#e68b5eff', '#e68a5eff', '#e68a5eff', '#e6895eff', '#e6895eff', '#e6885eff', '#e5885eff', '#e5875eff', '#e5875eff', '#e5865eff', '#e5865dff', '#e5855dff', '#e5855dff', '#e4855dff', '#e4845dff', '#e4845dff', '#e4835dff', '#e4835dff', '#e4825dff', '#e3825dff', '#e3815dff', '#e3815dff', '#e3805dff', '#e3805dff', '#e37f5dff', '#e37f5dff', '#e27e5dff', '#e27e5dff', '#e27e5dff', '#e27d5dff', '#e27d5dff', '#e27c5dff', '#e27c5dff', '#e17b5dff', '#e17b5dff', '#e17a5dff', '#e17a5dff', '#e1795dff', '#e1795dff', '#e1785dff', '#e0785dff', '#e0775dff', '#e0775dff', '#e0775dff', '#e0765dff', '#e0765dff', '#df755dff', '#df755dff', '#df745dff', '#df745dff', '#df735dff', '#df735dff', '#df725dff', '#de725dff', '#de715dff', '#de715dff', '#de705dff', '#de705dff', '#de705dff', '#de6f5dff', '#dd6f5cff', '#dd6e5cff', '#dd6e5cff', '#dd6d5cff', '#dd6d5cff', '#dd6c5cff', '#dc6c5cff', '#dc6b5cff', '#dc6b5cff', '#dc6a5cff', '#dc6a5cff', '#dc695cff', '#dc695cff', '#db695cff', '#db685cff', '#db685cff', '#db675cff', '#db675cff', '#db665cff', '#db665cff', '#da655cff', '#da655cff', '#da645cff', '#da645cff', '#da635cff', '#da635cff', '#da625cff', '#d9625cff', '#d9625cff', '#d9615cff', '#d9615cff', '#d9605cff', '#d9605cff', '#d85f5cff', '#d85f5cff', '#d85e5cff', '#d85e5cff', '#d85d5cff', '#d85d5cff', '#d85c5cff', '#d75c5cff', '#d75b5cff', '#d75b5cff', '#d75b5cff', '#d75a5cff', '#d75a5cff', '#d7595cff', '#d6595cff', '#d6585cff', '#d6585cff', '#d6575bff', '#d6575bff', '#d6565bff', '#d5565bff', '#d5555bff', '#d5555bff', '#d5545bff', '#d5545bff', '#d5545bff', '#d5535bff', '#d4535bff', '#d4525bff', '#d4525bff', '#d4515bff', '#d4515bff', '#d4505bff', '#d4505bff', '#d34f5bff', '#d34f5bff', '#d34e5bff', '#d34e5bff', '#d34d5bff', '#d34d5bff', '#d34d5bff', '#d24c5bff', '#d24c5bff', '#d24b5bff', '#d24b5bff', '#d24a5bff', '#d24a5bff', '#d1495bff', '#d1495bff']);
+    
+
+    color_map_58f8d6c33219ba0d2d9508fdbb978240.x = d3.scale.linear()
+              .domain([0.0, 9.16])
+              .range([0, 450 - 50]);
+
+    color_map_58f8d6c33219ba0d2d9508fdbb978240.legend = L.control({position: 'topright'});
+    color_map_58f8d6c33219ba0d2d9508fdbb978240.legend.onAdd = function (map) {var div = L.DomUtil.create('div', 'legend'); return div};
+    color_map_58f8d6c33219ba0d2d9508fdbb978240.legend.addTo(map_a87b2cfb8dfffa245a38002ae3de889a);
+
+    color_map_58f8d6c33219ba0d2d9508fdbb978240.xAxis = d3.svg.axis()
+        .scale(color_map_58f8d6c33219ba0d2d9508fdbb978240.x)
+        .orient("top")
+        .tickSize(1)
+        .tickValues([0.0, 4.58, 9.16]);
+
+    color_map_58f8d6c33219ba0d2d9508fdbb978240.svg = d3.select(".legend.leaflet-control").append("svg")
+        .attr("id", 'legend')
+        .attr("width", 450)
+        .attr("height", 40);
+
+    color_map_58f8d6c33219ba0d2d9508fdbb978240.g = color_map_58f8d6c33219ba0d2d9508fdbb978240.svg.append("g")
+        .attr("class", "key")
+        .attr("fill", "black")
+        .attr("transform", "translate(25,16)");
+
+    color_map_58f8d6c33219ba0d2d9508fdbb978240.g.selectAll("rect")
+        .data(color_map_58f8d6c33219ba0d2d9508fdbb978240.color.range().map(function(d, i) {
+          return {
+            x0: i ? color_map_58f8d6c33219ba0d2d9508fdbb978240.x(color_map_58f8d6c33219ba0d2d9508fdbb978240.color.domain()[i - 1]) : color_map_58f8d6c33219ba0d2d9508fdbb978240.x.range()[0],
+            x1: i < color_map_58f8d6c33219ba0d2d9508fdbb978240.color.domain().length ? color_map_58f8d6c33219ba0d2d9508fdbb978240.x(color_map_58f8d6c33219ba0d2d9508fdbb978240.color.domain()[i]) : color_map_58f8d6c33219ba0d2d9508fdbb978240.x.range()[1],
+            z: d
+          };
+        }))
+      .enter().append("rect")
+        .attr("height", 40 - 30)
+        .attr("x", function(d) { return d.x0; })
+        .attr("width", function(d) { return d.x1 - d.x0; })
+        .style("fill", function(d) { return d.z; });
+
+    color_map_58f8d6c33219ba0d2d9508fdbb978240.g.call(color_map_58f8d6c33219ba0d2d9508fdbb978240.xAxis).append("text")
+        .attr("class", "caption")
+        .attr("y", 21)
+        .attr("fill", "black")
+        .text("Approx. straight-line miles from ZIP centroid to current Seva site");
+    
+            var layer_control_76a537c22033879636510524f0279e49_layers = {
+                base_layers : {"OpenStreetMap": osm_basemap},
+                overlays :  {
+                    "1. ZIP bubbles \u2014 households" : feature_group_39704ac4ebe83cd56884d241719bfa23,
+                    "2. ZIP density heat \u2014 households" : feature_group_ee5d2b12eae2f8b6fbbf10766bbc9ceb,
+                    "3. Current + candidate areas" : feature_group_367762a3184dd86afda496883cb8bbf4,
+                    "4. Travel burden \u2014 miles to current site" : feature_group_d8df6d5a0444a57aa541a33d628dcea3,
+                },
+            };
+            let layer_control_76a537c22033879636510524f0279e49 = L.control.layers(
+                layer_control_76a537c22033879636510524f0279e49_layers.base_layers,
+                layer_control_76a537c22033879636510524f0279e49_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_a87b2cfb8dfffa245a38002ae3de889a);
+            // Quick view buttons: Southern California / Orange County and statewide California.
+            var SevaViewControl = L.Control.extend({
+                options: { position: 'topleft' },
+                onAdd: function(map) {
+                    var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+                    container.style.background = 'white';
+                    container.style.display = 'flex';
+                    container.style.flexDirection = 'column';
+                    container.style.fontFamily = 'Arial, sans-serif';
+
+                    var oc = L.DomUtil.create('a', '', container);
+                    oc.href = '#';
+                    oc.title = 'Orange County view';
+                    oc.innerHTML = 'OC';
+                    oc.style.width = '32px';
+                    oc.style.height = '32px';
+                    oc.style.lineHeight = '32px';
+                    oc.style.textAlign = 'center';
+                    oc.style.fontWeight = '700';
+                    oc.style.textDecoration = 'none';
+
+                    var ca = L.DomUtil.create('a', '', container);
+                    ca.href = '#';
+                    ca.title = 'California view';
+                    ca.innerHTML = 'CA';
+                    ca.style.width = '32px';
+                    ca.style.height = '32px';
+                    ca.style.lineHeight = '32px';
+                    ca.style.textAlign = 'center';
+                    ca.style.fontWeight = '700';
+                    ca.style.textDecoration = 'none';
+
+                    L.DomEvent.disableClickPropagation(container);
+                    L.DomEvent.on(oc, 'click', function(e) {
+                        L.DomEvent.preventDefault(e);
+                        map.setView([33.744, -117.884], 10);
+                    });
+                    L.DomEvent.on(ca, 'click', function(e) {
+                        L.DomEvent.preventDefault(e);
+                        map.setView([36.7783, -119.4179], 6);
+                    });
+                    return container;
+                }
+            });
+            new SevaViewControl().addTo(map_a87b2cfb8dfffa245a38002ae3de889a);
+
+        
+</script>
+</html>
